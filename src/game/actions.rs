@@ -33,3 +33,10 @@ pub fn handle_player_move(
         }
     }
 }
+
+pub trait Action: Send + Sync {
+    fn execute(&self, world: &mut World) -> Option<Box<dyn Action>>;
+    fn is_valid(&self, _world: &mut World) -> bool {
+        true
+    }
+}
