@@ -26,7 +26,10 @@ impl Plugin for GamePlugin {
         .add_systems(
             Update,
             (actions::handle_player_move, actions::handle_game_events),
-        );
+        )
+        .init_resource::<QueueSystems>()
+        .init_resource::<ActionQueue>()
+        .init_resource::<ActorQueue>();
     }
 }
 
@@ -45,10 +48,10 @@ impl FromWorld for QueueSystems {
     }
 }
 
-#[derive(Resource)]
+#[derive(Resource, Default)]
 struct ActionQueue(VecDeque<Box<dyn actions::Action>>);
 
-#[derive(Resource)]
+#[derive(Resource, Default)]
 struct ActorQueue(VecDeque<Entity>);
 
 fn collect_actor_queue(
@@ -63,8 +66,22 @@ fn collect_actor_queue(
 }
 
 fn handle_actor_queue(world: &mut World) {
+    // NOTE: アクター列の先頭を取得
     let Some(&entity) = world.resource::<ActorQueue>().0.front() else {
+        // NOTE: なければ新たにアクター列を作る
         let _ = world.run_system(world.resource::<QueueSystems>().collect_actor_queue);
         return;
     };
+
+    // NOTE: player用の処理
+    if let Some(mut player) = world.get_mut::<components::Player>(entity) {
+        if let Some(target) = player.0.take() {
+            if let Some(action) = actions::get_action_at(entity, target, world) {
+                world.resource_mut::<ActionQueue>().0.push_back(action);
+                world.resource_mut::<ActorQueue>().0.pop_front();
+            }
+        }
+    }
+
+    // NOTE: enemy用の処理
 }

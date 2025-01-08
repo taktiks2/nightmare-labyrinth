@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 #[derive(Component)]
-pub struct Player;
+pub struct Player(pub Option<IVec2>);
 
 #[derive(Component)]
 pub struct Item;
