@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-#[derive(Component)]
+#[derive(Component, Default, Debug)]
 pub struct Player(pub Option<IVec2>);
 
 #[derive(Component)]
