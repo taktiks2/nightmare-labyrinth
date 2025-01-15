@@ -12,5 +12,7 @@ pub fn spawn_player(mut commands: Commands, atlas: Res<resources::Atlas>) {
         IVec2::new(3, 3),
         Some(2.),
     );
-    commands.entity(entity).insert(components::Player);
+    commands
+        .entity(entity)
+        .insert(components::Player::default());
 }

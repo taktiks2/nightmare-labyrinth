@@ -4,39 +4,60 @@ use crate::components;
 use crate::events;
 use crate::game::utils;
 
-pub fn handle_game_events(
-    mut commands: Commands,
-    mut events: EventReader<events::GameEvent>,
-    mut query: Query<(Entity, &mut Transform), With<components::Player>>,
-) {
-    for event in events.read() {
-        match event {
-            events::GameEvent::Move(entity, target) => {
-                println!("Move: {:?} -> {:?}", entity, target);
-            }
-            events::GameEvent::Attack(entity, target) => {
-                println!("Attack: {:?} -> {:?}", entity, target);
-            }
+pub fn get_enemy_action(entity: Entity, world: &mut World) -> Option<Box<dyn Action>> {
+    let position = world.get::<components::Position>(entity)?.0;
+    for dir in [IVec2::X, IVec2::Y, IVec2::NEG_X, IVec2::NEG_Y] {
+        if let Some(action) = get_action_at(entity, position + dir, world) {
+            return Some(action);
         }
     }
+    None
 }
 
-pub fn handle_player_move(
-    mut input_events: EventReader<events::InputEvent>,
-    mut query: Query<(&mut components::Position, &mut Transform), With<components::Player>>,
-) {
-    for event in input_events.read() {
-        if let Ok((mut position, mut transform)) = query.get_single_mut() {
-            position.0 += event.0;
-            transform.translation =
-                utils::position_to_translation(position.0, Some(transform.translation.z));
+pub fn get_action_at(entity: Entity, target: IVec2, world: &mut World) -> Option<Box<dyn Action>> {
+    let actions: Vec<Box<dyn Action>> = vec![Box::new(MoveAction { entity, target })];
+    for action in actions {
+        if action.is_valid(world) {
+            return Some(action);
         }
     }
+    None
 }
 
 pub trait Action: Send + Sync {
     fn execute(&self, world: &mut World) -> Option<Box<dyn Action>>;
     fn is_valid(&self, _world: &mut World) -> bool {
+        true
+    }
+}
+
+pub struct MoveAction {
+    pub entity: Entity,
+    pub target: IVec2,
+}
+
+impl Action for MoveAction {
+    fn execute(&self, world: &mut World) -> Option<Box<dyn Action>> {
+        world.get_mut::<components::Position>(self.entity)?.0 = self.target;
+        world.send_event::<events::GameEvent>(events::GameEvent::Move(self.entity, self.target));
+        None
+    }
+    fn is_valid(&self, _world: &mut World) -> bool {
+        utils::is_on_board(self.target)
+    }
+}
+
+pub struct AttackAction {
+    pub entity: Entity,
+    pub target: Entity,
+}
+
+impl Action for AttackAction {
+    fn execute(&self, world: &mut World) -> Option<Box<dyn Action>> {
+        None
+    }
+    fn is_valid(&self, world: &mut World) -> bool {
+        // NOTE: 動いても良いかどうかの判定
         true
     }
 }

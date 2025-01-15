@@ -8,3 +8,6 @@ pub enum GameEvent {
 
 #[derive(Event)]
 pub struct InputEvent(pub IVec2);
+
+#[derive(Event)]
+pub struct GameTick;

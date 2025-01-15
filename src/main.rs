@@ -18,6 +18,7 @@ fn main() {
         .add_systems(Update, input::handle_keyboard_input)
         .add_event::<events::GameEvent>()
         .add_event::<events::InputEvent>()
+        .add_event::<events::GameTick>()
         .init_resource::<resources::Atlas>()
         .run();
 }
