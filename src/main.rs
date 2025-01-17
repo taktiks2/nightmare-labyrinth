@@ -7,6 +7,7 @@ mod game;
 mod globals;
 mod input;
 mod resources;
+mod states;
 
 use globals::*;
 
