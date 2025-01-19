@@ -10,13 +10,14 @@ mod utils;
 
 use crate::components;
 use crate::events;
+use crate::states;
 
 pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
-            Startup,
+            OnEnter(states::GameState::Playing),
             (
                 board::spawn_board,
                 player::spawn_player,
@@ -24,7 +25,10 @@ impl Plugin for GamePlugin {
                 items::spawn_item,
             ),
         )
-        .add_systems(Update, (handle_input_events, handle_game_events))
+        .add_systems(
+            Update,
+            (handle_input_events, handle_game_events).run_if(in_state(states::GameState::Playing)),
+        )
         .add_systems(
             Update,
             handle_action_queue.run_if(on_event::<events::GameTick>),

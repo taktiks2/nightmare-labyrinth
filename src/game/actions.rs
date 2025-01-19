@@ -48,15 +48,15 @@ impl Action for MoveAction {
 }
 
 pub struct AttackAction {
-    pub entity: Entity,
-    pub target: Entity,
+    pub _entity: Entity,
+    pub _target: Entity,
 }
 
 impl Action for AttackAction {
-    fn execute(&self, world: &mut World) -> Option<Box<dyn Action>> {
+    fn execute(&self, _world: &mut World) -> Option<Box<dyn Action>> {
         None
     }
-    fn is_valid(&self, world: &mut World) -> bool {
+    fn is_valid(&self, _world: &mut World) -> bool {
         // NOTE: 動いても良いかどうかの判定
         true
     }

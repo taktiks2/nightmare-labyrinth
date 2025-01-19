@@ -4,6 +4,7 @@ use std::ops::Neg;
 use crate::components;
 use crate::globals;
 use crate::resources;
+use crate::states;
 
 pub enum Texture {
     LeftTopCorner = 0,
@@ -38,6 +39,7 @@ pub fn spawn_sprite_at(
             ),
             Transform::from_translation(position_to_translation(position, z))
                 .with_scale(Vec3::new(globals::SPRITE_SCALE, globals::SPRITE_SCALE, 1.)),
+            StateScoped(states::GameState::Playing), // NOTE: stateが変わるとワールドから削除できる
             components::Position(IVec2::new(position.x, position.y)),
         ))
         .id()
