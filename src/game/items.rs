@@ -11,6 +11,7 @@ pub fn spawn_item(mut commands: Commands, atlas: Res<resources::Atlas>) {
         utils::Texture::Coin,
         IVec2::new(4, 3),
         Some(1.),
+        Some("item".to_string()),
     );
     commands.entity(entity).insert(components::Item);
 }

@@ -11,6 +11,7 @@ pub fn spawn_player(mut commands: Commands, atlas: Res<resources::Atlas>) {
         utils::Texture::Cat,
         IVec2::new(3, 3),
         Some(2.),
+        Some("player".to_string()),
     );
     commands
         .entity(entity)

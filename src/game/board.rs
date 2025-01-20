@@ -13,6 +13,7 @@ pub fn spawn_board(mut commands: Commands, atlas: Res<resources::Atlas>) {
                 board_texture(y, x),
                 IVec2::new(x, y),
                 Some(0.),
+                Some("board".to_string()),
             );
         }
     }

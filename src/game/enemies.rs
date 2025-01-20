@@ -11,6 +11,7 @@ pub fn spawn_enemy(mut commands: Commands, atlas: Res<resources::Atlas>) {
         utils::Texture::Snake,
         IVec2::new(5, 5),
         Some(2.),
+        Some("enemy".to_string()),
     );
     commands.entity(entity).insert(components::Enemy);
 }

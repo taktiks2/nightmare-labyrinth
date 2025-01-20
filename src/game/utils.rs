@@ -27,9 +27,10 @@ pub fn spawn_sprite_at(
     texture: Texture,
     position: IVec2,
     z: Option<f32>,
+    name: Option<String>,
 ) -> Entity {
-    commands
-        .spawn((
+    let mut entity_commands =
+        commands.spawn((
             Sprite::from_atlas_image(
                 atlas.texture.clone(),
                 TextureAtlas {
@@ -41,8 +42,11 @@ pub fn spawn_sprite_at(
                 .with_scale(Vec3::new(globals::SPRITE_SCALE, globals::SPRITE_SCALE, 1.)),
             StateScoped(states::GameState::Playing), // NOTE: stateが変わるとワールドから削除できる
             components::Position(IVec2::new(position.x, position.y)),
-        ))
-        .id()
+        ));
+    if let Some(name) = name {
+        entity_commands.insert(Name::new(name));
+    }
+    entity_commands.id()
 }
 
 pub fn position_to_translation(position: IVec2, z: Option<f32>) -> Vec3 {
