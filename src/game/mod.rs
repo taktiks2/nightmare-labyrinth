@@ -5,6 +5,7 @@ mod actions;
 mod board;
 mod enemies;
 mod items;
+mod obstacles;
 mod player;
 mod utils;
 
@@ -23,6 +24,7 @@ impl Plugin for GamePlugin {
                 player::spawn_player,
                 enemies::spawn_enemy,
                 items::spawn_item,
+                obstacles::spawn_obstacle,
             ),
         )
         .add_systems(

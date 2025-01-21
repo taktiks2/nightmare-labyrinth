@@ -19,6 +19,10 @@ pub enum Texture {
     Coin = 9,
     Snake = 10,
     Cat = 11,
+    Column = 12,
+    Heart = 13,
+    Sword = 14,
+    Shield = 15,
 }
 
 pub fn spawn_sprite_at(

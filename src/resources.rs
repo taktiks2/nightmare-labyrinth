@@ -7,7 +7,7 @@ pub struct Atlas {
         tile_size_x = 32,
         tile_size_y = 32,
         columns = 4,
-        rows = 3,
+        rows = 4,
         padding_x = 1,
         padding_y = 1,
     ))]
