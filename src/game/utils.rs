@@ -6,29 +6,10 @@ use crate::globals;
 use crate::resources;
 use crate::states;
 
-pub enum Texture {
-    LeftTopCorner = 0,
-    RightTopCorner = 1,
-    LeftBottomCorner = 2,
-    RightBottomCorner = 3,
-    TopEdge = 4,
-    BottomEdge = 5,
-    LeftEdge = 6,
-    RightEdge = 7,
-    Center = 8,
-    Coin = 9,
-    Snake = 10,
-    Cat = 11,
-    Column = 12,
-    Heart = 13,
-    Sword = 14,
-    Shield = 15,
-}
-
 pub fn spawn_sprite_at(
     commands: &mut Commands,
     atlas: &resources::Atlas,
-    texture: Texture,
+    texture: resources::Texture,
     position: IVec2,
     z: Option<f32>,
     name: Option<String>,

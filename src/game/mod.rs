@@ -3,14 +3,12 @@ use std::collections::VecDeque;
 
 mod actions;
 mod board;
-mod enemies;
-mod items;
-mod obstacles;
-mod player;
+mod objects;
 mod utils;
 
 use crate::components;
 use crate::events;
+use crate::resources;
 use crate::states;
 
 pub struct GamePlugin;
@@ -19,13 +17,7 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             OnEnter(states::GameState::Playing),
-            (
-                board::spawn_board,
-                player::spawn_player,
-                enemies::spawn_enemy,
-                items::spawn_item,
-                obstacles::spawn_obstacle,
-            ),
+            (board::spawn_board, objects::spawn_object),
         )
         .add_systems(
             Update,
@@ -35,6 +27,7 @@ impl Plugin for GamePlugin {
             Update,
             handle_action_queue.run_if(on_event::<events::GameTick>),
         )
+        .init_resource::<resources::GameBoardLayers>()
         .init_resource::<QueueSystems>()
         .init_resource::<ActionQueue>()
         .init_resource::<ActorQueue>();
