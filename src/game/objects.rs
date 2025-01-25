@@ -20,10 +20,38 @@ pub fn spawn_object(
                     Some(1.),
                     Some("object".to_string()),
                 );
-                commands
-                    .entity(entity)
-                    .insert(components::Player::default());
+                add_components_for_texture(&mut commands, entity, texture);
             }
         }
+    }
+}
+
+fn add_components_for_texture(
+    commands: &mut Commands,
+    entity: Entity,
+    texture: &resources::Texture,
+) {
+    match texture {
+        resources::Texture::Cat => {
+            commands
+                .entity(entity)
+                .insert((components::Player::default(), Name::new("player")));
+        }
+        resources::Texture::Snake => {
+            commands
+                .entity(entity)
+                .insert((components::Enemy, Name::new("enemy")));
+        }
+        resources::Texture::Coin => {
+            commands
+                .entity(entity)
+                .insert((components::Item, Name::new("item")));
+        }
+        resources::Texture::Column => {
+            commands
+                .entity(entity)
+                .insert((components::Obstacle, Name::new("obstacle")));
+        }
+        _ => {} // NOTE: その他のテクスチャの場合は何もしない
     }
 }

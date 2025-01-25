@@ -16,7 +16,7 @@ pub struct Atlas {
     pub texture: Handle<Image>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub enum Texture {
     LeftTopCorner = 0,
     RightTopCorner = 1,

@@ -10,6 +10,9 @@ pub struct Item;
 pub struct Enemy;
 
 #[derive(Component)]
+pub struct Obstacle;
+
+#[derive(Component)]
 pub struct Attack(pub u32);
 
 #[derive(Component)]
