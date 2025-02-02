@@ -4,50 +4,46 @@ use crate::components;
 use crate::game::utils;
 use crate::resources;
 
-pub fn spawn_object(
-    mut commands: Commands,
-    board_layer: Res<resources::GameBoardLayers>,
-    atlas: Res<resources::Atlas>,
-) {
-    for (y, row) in board_layer.object_layer.iter().enumerate() {
-        for (x, texture) in row.iter().enumerate() {
-            if let Some(texture) = texture {
-                let entity = utils::spawn_sprite_at(
-                    &mut commands,
-                    &atlas,
-                    texture.clone(),
-                    IVec2::new(x as i32, y as i32),
-                    Some(1.),
-                    Some("object".to_string()),
-                );
-                add_components_for_texture(&mut commands, entity, texture);
-            }
-        }
-    }
+pub fn spawn_object(mut commands: Commands, game_assets: Res<resources::GameAssets>) {
+    let entity = utils::spawn_sprite_at(
+        &mut commands,
+        &game_assets,
+        resources::Tile::Cat,
+        IVec2::new(4, 4),
+        Some(1.),
+        Some("board".to_string()),
+    );
+    add_components_for_texture(&mut commands, entity, &resources::Tile::Cat);
+
+    let entity = utils::spawn_sprite_at(
+        &mut commands,
+        &game_assets,
+        resources::Tile::Snake,
+        IVec2::new(4, 5),
+        Some(1.),
+        Some("board".to_string()),
+    );
+    add_components_for_texture(&mut commands, entity, &resources::Tile::Snake);
 }
 
-fn add_components_for_texture(
-    commands: &mut Commands,
-    entity: Entity,
-    texture: &resources::Texture,
-) {
-    match texture {
-        resources::Texture::Cat => {
+fn add_components_for_texture(commands: &mut Commands, entity: Entity, tile: &resources::Tile) {
+    match tile {
+        resources::Tile::Cat => {
             commands
                 .entity(entity)
                 .insert((components::Player::default(), Name::new("player")));
         }
-        resources::Texture::Snake => {
+        resources::Tile::Snake => {
             commands
                 .entity(entity)
                 .insert((components::Enemy, Name::new("enemy")));
         }
-        resources::Texture::Coin => {
+        resources::Tile::Coin => {
             commands
                 .entity(entity)
                 .insert((components::Item, Name::new("item")));
         }
-        resources::Texture::Column => {
+        resources::Tile::Column => {
             commands
                 .entity(entity)
                 .insert((components::Obstacle, Name::new("obstacle")));

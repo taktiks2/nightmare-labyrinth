@@ -1,4 +1,5 @@
 use bevy::{asset::AssetMetaCheck, log::LogPlugin, prelude::*};
+use bevy_aseprite_ultra::prelude::*;
 use bevy_asset_loader::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use std::ops::Neg;
@@ -38,9 +39,10 @@ fn main() {
                     ..default()
                 }),
         )
+        .add_plugins(AsepriteUltraPlugin)
         .add_plugins(MeshPickingPlugin) // NOTE: meshやプラグインをクリック検知するのに必要
         .add_plugins(WorldInspectorPlugin::new()) // NOTE: インスペクタープラグイン
-        .enable_state_scoped_entities::<states::GameState>() // NOTE: StateScopedを使うために必要
+        .enable_state_scoped_entities::<states::GameState>() // NOTE: StateScopedを使うために必要、エンティティを自動で削除する
         .init_state::<states::GameState>()
         .add_plugins(game::GamePlugin)
         .add_plugins(loading::LoadingPlugin)
@@ -49,7 +51,7 @@ fn main() {
             // NOTE: アセットがロードされるまでローディングを出す
             LoadingState::new(states::GameState::Loading)
                 .continue_to_state(states::GameState::Title)
-                .load_collection::<resources::Atlas>(),
+                .load_collection::<resources::GameAssets>(),
         )
         .add_systems(Startup, setup_camera)
         .add_systems(Update, input::handle_keyboard_input)

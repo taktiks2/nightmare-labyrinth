@@ -8,7 +8,6 @@ mod utils;
 
 use crate::components;
 use crate::events;
-use crate::resources;
 use crate::states;
 
 pub struct GamePlugin;
@@ -27,7 +26,6 @@ impl Plugin for GamePlugin {
             Update,
             handle_action_queue.run_if(on_event::<events::GameTick>),
         )
-        .init_resource::<resources::GameBoardLayers>()
         .init_resource::<QueueSystems>()
         .init_resource::<ActionQueue>()
         .init_resource::<ActorQueue>();
