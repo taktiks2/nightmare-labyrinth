@@ -11,7 +11,7 @@ pub fn spawn_object(mut commands: Commands, game_assets: Res<resources::GameAsse
         resources::Tile::Cat,
         IVec2::new(4, 4),
         Some(1.),
-        Some("board".to_string()),
+        Some("player".to_string()),
     );
     add_components_for_texture(&mut commands, entity, &resources::Tile::Cat);
 
@@ -21,9 +21,29 @@ pub fn spawn_object(mut commands: Commands, game_assets: Res<resources::GameAsse
         resources::Tile::Snake,
         IVec2::new(4, 5),
         Some(1.),
-        Some("board".to_string()),
+        Some("enemy".to_string()),
     );
     add_components_for_texture(&mut commands, entity, &resources::Tile::Snake);
+
+    let entity = utils::spawn_sprite_at(
+        &mut commands,
+        &game_assets,
+        resources::Tile::Column,
+        IVec2::new(6, 6),
+        Some(1.),
+        Some("obstacle".to_string()),
+    );
+    add_components_for_texture(&mut commands, entity, &resources::Tile::Column);
+
+    let entity = utils::spawn_sprite_at(
+        &mut commands,
+        &game_assets,
+        resources::Tile::Column,
+        IVec2::new(6, 7),
+        Some(1.),
+        Some("obstacle".to_string()),
+    );
+    add_components_for_texture(&mut commands, entity, &resources::Tile::Column);
 }
 
 fn add_components_for_texture(commands: &mut Commands, entity: Entity, tile: &resources::Tile) {

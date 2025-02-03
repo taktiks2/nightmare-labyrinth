@@ -42,8 +42,13 @@ impl Action for MoveAction {
         world.send_event::<events::GameEvent>(events::GameEvent::Move(self.entity, self.target));
         None
     }
-    fn is_valid(&self, _world: &mut World) -> bool {
-        utils::is_on_board(self.target)
+    fn is_valid(&self, world: &mut World) -> bool {
+        let has_obstacle = world
+            .query_filtered::<&components::Position, With<components::Obstacle>>()
+            .iter(world)
+            .any(|pos| pos.0 == self.target);
+
+        !has_obstacle && utils::is_on_board(self.target)
     }
 }
 
