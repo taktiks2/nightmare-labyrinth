@@ -3,11 +3,13 @@ use std::collections::VecDeque;
 
 mod actions;
 mod board;
+mod input;
 mod objects;
 mod utils;
 
 use crate::components;
 use crate::events;
+use crate::resources;
 use crate::states;
 
 pub struct GamePlugin;
@@ -20,12 +22,18 @@ impl Plugin for GamePlugin {
         )
         .add_systems(
             Update,
-            (handle_input_events, handle_game_events).run_if(in_state(states::GameState::Playing)),
+            (
+                input::handle_keyboard_input,
+                handle_input_events,
+                handle_game_events,
+            )
+                .run_if(in_state(states::GameState::Playing)),
         )
         .add_systems(
             Update,
             handle_action_queue.run_if(on_event::<events::GameTick>),
         )
+        .init_resource::<resources::Inventory>()
         .init_resource::<QueueSystems>()
         .init_resource::<ActionQueue>()
         .init_resource::<ActorQueue>();
@@ -111,19 +119,29 @@ fn handle_input_events(
 }
 
 fn handle_game_events(
+    mut commands: Commands,
     mut game_events: EventReader<events::GameEvent>,
-    mut query: Query<&mut Transform>,
+    mut actors: Query<&mut Transform>,
     mut tick_events: EventWriter<events::GameTick>,
+    mut inventory: ResMut<resources::Inventory>,
+    items: Query<&components::Item>,
 ) {
     for event in game_events.read() {
         match event {
             events::GameEvent::Move(entity, target) => {
-                if let Ok(mut transform) = query.get_mut(*entity) {
+                if let Ok(mut transform) = actors.get_mut(*entity) {
                     transform.translation =
                         utils::position_to_translation(*target, Some(transform.translation.z))
                 }
             }
             events::GameEvent::Attack(entity, target) => {}
+            events::GameEvent::Collect(entity) => {
+                if let Ok(item) = items.get(*entity) {
+                    inventory.items.push(item.clone());
+                }
+                commands.entity(*entity).despawn_recursive();
+                debug!("{:?}", inventory);
+            }
         }
     }
     tick_events.send(events::GameTick);

@@ -38,6 +38,14 @@ pub struct MoveAction {
 
 impl Action for MoveAction {
     fn execute(&self, world: &mut World) -> Option<Box<dyn Action>> {
+        // TODO: アイテムを取得する処理
+        if let Some((item_entity, _)) = world
+            .query_filtered::<(Entity, &components::Position), With<components::Item>>()
+            .iter(world)
+            .find(|(_, position)| position.0 == self.target)
+        {
+            world.send_event::<events::GameEvent>(events::GameEvent::Collect(item_entity));
+        }
         world.get_mut::<components::Position>(self.entity)?.0 = self.target;
         world.send_event::<events::GameEvent>(events::GameEvent::Move(self.entity, self.target));
         None
@@ -46,7 +54,7 @@ impl Action for MoveAction {
         let has_obstacle = world
             .query_filtered::<&components::Position, With<components::Obstacle>>()
             .iter(world)
-            .any(|pos| pos.0 == self.target);
+            .any(|pos| pos.0 == self.target); // NOTE: iterの中で一つでも適合する条件のものがあればtrueを返す
 
         !has_obstacle && utils::is_on_board(self.target)
     }

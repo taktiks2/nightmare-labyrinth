@@ -3,8 +3,18 @@ use bevy::prelude::*;
 #[derive(Component, Default, Debug)]
 pub struct Player(pub Option<IVec2>);
 
-#[derive(Component)]
-pub struct Item;
+#[derive(Component, Clone, Debug)]
+pub struct Item {
+    pub name: String,
+    pub item_type: ItemType,
+}
+
+#[derive(Clone, Debug)]
+pub enum ItemType {
+    Potion,
+    Sword,
+    Coin,
+}
 
 #[derive(Component)]
 pub struct Enemy;

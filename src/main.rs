@@ -8,7 +8,6 @@ mod components;
 mod events;
 mod game;
 mod globals;
-mod input;
 mod loading;
 mod resources;
 mod states;
@@ -53,8 +52,7 @@ fn main() {
                 .continue_to_state(states::GameState::Title)
                 .load_collection::<resources::GameAssets>(),
         )
-        .add_systems(Startup, setup_camera)
-        .add_systems(Update, input::handle_keyboard_input)
+        .add_systems(Startup, setup)
         .add_event::<events::GameEvent>()
         .add_event::<events::InputEvent>()
         .add_event::<events::GameTick>()
@@ -65,7 +63,7 @@ fn calculate_offset(size: f32) -> f32 {
     0.5 * SPRITE_SCALE * SPRITE_SIZE * (size - 1.)
 }
 
-fn setup_camera(mut commands: Commands) {
+fn setup(mut commands: Commands) {
     commands.spawn((
         Camera2d,
         Name::new("main camera"),

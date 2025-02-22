@@ -8,12 +8,12 @@ pub fn spawn_object(mut commands: Commands, game_assets: Res<resources::GameAsse
     let entity = utils::spawn_sprite_at(
         &mut commands,
         &game_assets,
-        resources::Tile::Cat,
+        resources::Tile::Player,
         IVec2::new(4, 4),
         Some(1.),
         Some("player".to_string()),
     );
-    add_components_for_texture(&mut commands, entity, &resources::Tile::Cat);
+    add_components_for_texture(&mut commands, entity, &resources::Tile::Player);
 
     let entity = utils::spawn_sprite_at(
         &mut commands,
@@ -28,27 +28,47 @@ pub fn spawn_object(mut commands: Commands, game_assets: Res<resources::GameAsse
     let entity = utils::spawn_sprite_at(
         &mut commands,
         &game_assets,
-        resources::Tile::Column,
+        resources::Tile::Block,
         IVec2::new(6, 6),
         Some(1.),
         Some("obstacle".to_string()),
     );
-    add_components_for_texture(&mut commands, entity, &resources::Tile::Column);
+    add_components_for_texture(&mut commands, entity, &resources::Tile::Block);
 
     let entity = utils::spawn_sprite_at(
         &mut commands,
         &game_assets,
-        resources::Tile::Column,
+        resources::Tile::Block,
         IVec2::new(6, 7),
         Some(1.),
         Some("obstacle".to_string()),
     );
-    add_components_for_texture(&mut commands, entity, &resources::Tile::Column);
+    add_components_for_texture(&mut commands, entity, &resources::Tile::Block);
+
+    let entity = utils::spawn_sprite_at(
+        &mut commands,
+        &game_assets,
+        resources::Tile::Coin,
+        IVec2::new(3, 3),
+        Some(1.),
+        Some("item".to_string()),
+    );
+    add_components_for_texture(&mut commands, entity, &resources::Tile::Coin);
+
+    let entity = utils::spawn_sprite_at(
+        &mut commands,
+        &game_assets,
+        resources::Tile::Coin,
+        IVec2::new(3, 3),
+        Some(1.),
+        Some("item".to_string()),
+    );
+    add_components_for_texture(&mut commands, entity, &resources::Tile::Coin);
 }
 
 fn add_components_for_texture(commands: &mut Commands, entity: Entity, tile: &resources::Tile) {
     match tile {
-        resources::Tile::Cat => {
+        resources::Tile::Player => {
             commands
                 .entity(entity)
                 .insert((components::Player::default(), Name::new("player")));
@@ -59,11 +79,15 @@ fn add_components_for_texture(commands: &mut Commands, entity: Entity, tile: &re
                 .insert((components::Enemy, Name::new("enemy")));
         }
         resources::Tile::Coin => {
-            commands
-                .entity(entity)
-                .insert((components::Item, Name::new("item")));
+            commands.entity(entity).insert((
+                components::Item {
+                    name: "coin".to_string(),
+                    item_type: components::ItemType::Coin,
+                },
+                Name::new("item"),
+            ));
         }
-        resources::Tile::Column => {
+        resources::Tile::Block => {
             commands
                 .entity(entity)
                 .insert((components::Obstacle, Name::new("obstacle")));

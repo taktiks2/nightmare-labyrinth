@@ -20,17 +20,12 @@ pub fn spawn_board(mut commands: Commands, game_assets: Res<resources::GameAsset
 }
 
 fn get_tile(y: i32, x: i32) -> resources::Tile {
-    match (y, x) {
-        (0, 0) => resources::Tile::LeftTopCorner,
-        (y, x) if y == 0 && x == globals::BOARD_WIDTH - 1 => resources::Tile::RightTopCorner,
-        (y, x) if y == globals::BOARD_HEIGHT - 1 && x == 0 => resources::Tile::LeftBottomCorner,
-        (y, x) if y == globals::BOARD_HEIGHT - 1 && x == globals::BOARD_WIDTH - 1 => {
-            resources::Tile::RightBottomCorner
-        }
-        (0, _) => resources::Tile::TopEdge,
-        (y, _) if y == globals::BOARD_HEIGHT - 1 => resources::Tile::BottomEdge,
-        (_, 0) => resources::Tile::LeftEdge,
-        (_, x) if x == globals::BOARD_WIDTH - 1 => resources::Tile::RightEdge,
-        _ => resources::Tile::Center,
+    let is_border =
+        y == 0 || y == globals::BOARD_HEIGHT - 1 || x == 0 || x == globals::BOARD_WIDTH - 1;
+
+    if is_border {
+        resources::Tile::Block
+    } else {
+        resources::Tile::Inside
     }
 }

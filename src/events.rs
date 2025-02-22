@@ -4,6 +4,7 @@ use bevy::prelude::*;
 pub enum GameEvent {
     Move(Entity, IVec2),
     Attack(Entity, IVec2),
+    Collect(Entity),
 }
 
 #[derive(Event)]
