@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_aseprite_ultra::prelude::*;
 use bevy_asset_loader::asset_collection::AssetCollection;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::components;
 
@@ -13,10 +13,9 @@ pub struct GameAssets {
     pub level: Handle<Level>,
 }
 
-#[derive(Deserialize, Asset, TypePath)]
+#[derive(Deserialize, Serialize, Asset, TypePath)]
 pub struct Level {
     pub board: Vec<Vec<i32>>,
-    pub objects: Vec<Vec<i32>>,
 }
 
 #[derive(Clone, PartialEq)]

@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+use crate::components;
 use crate::game::utils;
 use crate::resources;
 
@@ -10,24 +11,81 @@ pub fn spawn_board(
 ) {
     if let Some(level) = levels.get(&game_assets.level) {
         for (y, row) in level.board.iter().enumerate() {
-            for (x, v) in row.iter().enumerate() {
+            for (x, id) in row.iter().enumerate() {
                 utils::spawn_sprite_at(
                     &mut commands,
                     &game_assets,
-                    get_tile(v),
+                    resources::Tile::Inside,
                     IVec2::new(x as i32, y as i32),
                     Some(0.),
-                    Some(format!("board_{}_{}", x, y)),
+                    Some(format!("inside_{}_{}", x, y)),
                 );
+                match id {
+                    1 => {
+                        utils::spawn_sprite_at(
+                            &mut commands,
+                            &game_assets,
+                            resources::Tile::Block,
+                            IVec2::new(x as i32, y as i32),
+                            Some(1.),
+                            Some("block".to_string()),
+                        );
+                    }
+                    2 => {
+                        let entity = utils::spawn_sprite_at(
+                            &mut commands,
+                            &game_assets,
+                            resources::Tile::Goal,
+                            IVec2::new(x as i32, y as i32),
+                            Some(1.),
+                            Some("goal".to_string()),
+                        );
+                        commands.entity(entity).insert(components::Goal);
+                    }
+                    3 => {
+                        let entity = utils::spawn_sprite_at(
+                            &mut commands,
+                            &game_assets,
+                            resources::Tile::Player,
+                            IVec2::new(x as i32, y as i32),
+                            Some(2.),
+                            Some("player".to_string()),
+                        );
+                        commands
+                            .entity(entity)
+                            .insert(components::Player::default());
+                    }
+                    4 => {
+                        let entity = utils::spawn_sprite_at(
+                            &mut commands,
+                            &game_assets,
+                            resources::Tile::Snake,
+                            IVec2::new(x as i32, y as i32),
+                            Some(2.),
+                            Some("enemy".to_string()),
+                        );
+                        commands.entity(entity).insert(components::Enemy);
+                    }
+                    5 => {
+                        let entity = utils::spawn_sprite_at(
+                            &mut commands,
+                            &game_assets,
+                            resources::Tile::Coin,
+                            IVec2::new(x as i32, y as i32),
+                            Some(1.),
+                            Some("item".to_string()),
+                        );
+                        commands.entity(entity).insert((
+                            components::Item {
+                                name: "coin".to_string(),
+                                item_type: components::ItemType::Coin,
+                            },
+                            Name::new("item"),
+                        ));
+                    }
+                    _ => {}
+                }
             }
         }
-    }
-}
-
-fn get_tile(num: &i32) -> resources::Tile {
-    if *num == 1 {
-        resources::Tile::Block
-    } else {
-        resources::Tile::Inside
     }
 }

@@ -5,7 +5,7 @@ use std::ops::Neg;
 mod actions;
 mod board;
 mod input;
-mod objects;
+mod save;
 mod utils;
 
 use crate::components;
@@ -20,11 +20,12 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             OnEnter(states::GameState::Playing),
-            (setup_game_camera, board::spawn_board, objects::spawn_object),
+            (setup_game_camera, board::spawn_board),
         )
         .add_systems(
             Update,
             (
+                save::save,
                 input::handle_keyboard_input,
                 handle_input_events,
                 handle_game_events,
