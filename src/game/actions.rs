@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::components;
 use crate::events;
-use crate::game::utils;
+use crate::resources;
 
 pub fn get_enemy_action(entity: Entity, world: &mut World) -> Option<Box<dyn Action>> {
     let position = world.get::<components::Position>(entity)?.0;
@@ -56,7 +56,19 @@ impl Action for MoveAction {
             .iter(world)
             .any(|pos| pos.0 == self.target); // NOTE: iterの中で一つでも適合する条件のものがあればtrueを返す
 
-        !has_obstacle && utils::is_on_board(self.target)
+        if let (Some(game_assets), Some(level_assets)) = (
+            world.get_resource::<resources::GameAssets>(),
+            world.get_resource::<Assets<resources::Level>>(),
+        ) {
+            if let Some(level) = level_assets.get(&game_assets.level) {
+                let value = level.board[self.target.y as usize][self.target.x as usize];
+                if value == 1 {
+                    return false;
+                }
+            }
+        }
+
+        !has_obstacle
     }
 }
 

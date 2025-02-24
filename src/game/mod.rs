@@ -1,5 +1,6 @@
 use bevy::{ecs::system::SystemId, prelude::*};
 use std::collections::VecDeque;
+use std::ops::Neg;
 
 mod actions;
 mod board;
@@ -9,6 +10,7 @@ mod utils;
 
 use crate::components;
 use crate::events;
+use crate::globals;
 use crate::resources;
 use crate::states;
 
@@ -18,7 +20,7 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             OnEnter(states::GameState::Playing),
-            (board::spawn_board, objects::spawn_object),
+            (setup_game_camera, board::spawn_board, objects::spawn_object),
         )
         .add_systems(
             Update,
@@ -38,6 +40,29 @@ impl Plugin for GamePlugin {
         .init_resource::<ActionQueue>()
         .init_resource::<ActorQueue>();
     }
+}
+
+fn setup_game_camera(
+    mut commands: Commands,
+    game_assets: Res<resources::GameAssets>,
+    levels: Res<Assets<resources::Level>>,
+) {
+    if let Some(level) = levels.get(&game_assets.level) {
+        commands.spawn((
+            Camera2d,
+            Name::new("game_camera"),
+            StateScoped(states::GameState::Loading), // NOTE: stateが変わるとワールドから削除できる
+            Transform::from_translation(Vec3::new(
+                calculate_offset(level.board[0].len() as f32),
+                calculate_offset(level.board.len() as f32).neg(),
+                0.,
+            )), // NOTE: 左上から座標が始まるようにnegにする
+        ));
+    }
+}
+
+fn calculate_offset(size: f32) -> f32 {
+    0.5 * globals::SPRITE_SCALE * globals::SPRITE_SIZE * (size - 1.)
 }
 
 #[derive(Resource)]

@@ -39,10 +39,3 @@ pub fn position_to_translation(position: IVec2, z: Option<f32>) -> Vec3 {
         z.unwrap_or_default(),
     )
 }
-
-pub fn is_on_board(position: IVec2) -> bool {
-    position.x >= 1
-        && position.y >= 1
-        && position.x < globals::BOARD_WIDTH - 1
-        && position.y < globals::BOARD_HEIGHT - 1
-}

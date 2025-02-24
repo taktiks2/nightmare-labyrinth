@@ -20,6 +20,9 @@ pub enum ItemType {
 pub struct Enemy;
 
 #[derive(Component)]
+pub struct Goal;
+
+#[derive(Component)]
 pub struct Obstacle;
 
 #[derive(Component)]

@@ -11,7 +11,6 @@ impl Plugin for LoadingPlugin {
 }
 
 fn setup_loading(mut commands: Commands) {
-    debug!("loading start");
     commands
         .spawn((
             Node {

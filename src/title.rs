@@ -6,12 +6,14 @@ pub struct TitlePlugin;
 
 impl Plugin for TitlePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(states::GameState::Title), setup_title);
+        app.add_systems(
+            OnEnter(states::GameState::Title),
+            (setup_title_camera, setup_title),
+        );
     }
 }
 
 fn setup_title(mut commands: Commands) {
-    debug!("title start");
     commands
         .spawn((
             Node {
@@ -65,10 +67,17 @@ fn setup_title(mut commands: Commands) {
         });
 }
 
+fn setup_title_camera(mut commands: Commands) {
+    commands.spawn((
+        Camera2d,
+        Name::new("title_camera"),
+        StateScoped(states::GameState::Title), // NOTE: stateが変わるとワールドから削除できる
+    ));
+}
+
 pub fn handle_click(
     _click: Trigger<Pointer<Click>>,
     mut next_state: ResMut<NextState<states::GameState>>,
 ) {
-    debug!("clicked");
     next_state.set(states::GameState::Playing);
 }

@@ -1,8 +1,8 @@
 use bevy::{asset::AssetMetaCheck, log::LogPlugin, prelude::*};
 use bevy_aseprite_ultra::prelude::*;
 use bevy_asset_loader::prelude::*;
+use bevy_common_assets::json::JsonAssetPlugin;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
-use std::ops::Neg;
 
 mod components;
 mod events;
@@ -12,8 +12,6 @@ mod loading;
 mod resources;
 mod states;
 mod title;
-
-use globals::*;
 
 fn main() {
     App::new()
@@ -38,6 +36,7 @@ fn main() {
                     ..default()
                 }),
         )
+        .add_plugins(JsonAssetPlugin::<resources::Level>::new(&["json"])) // NOTE: jsonファイルを読み込むのに必要 & 引数には拡張子部分を指定
         .add_plugins(AsepriteUltraPlugin)
         .add_plugins(MeshPickingPlugin) // NOTE: meshやプラグインをクリック検知するのに必要
         .add_plugins(WorldInspectorPlugin::new()) // NOTE: インスペクタープラグイン
@@ -52,25 +51,17 @@ fn main() {
                 .continue_to_state(states::GameState::Title)
                 .load_collection::<resources::GameAssets>(),
         )
-        .add_systems(Startup, setup)
+        .add_systems(OnEnter(states::GameState::Loading), setup_loading_camera)
         .add_event::<events::GameEvent>()
         .add_event::<events::InputEvent>()
         .add_event::<events::GameTick>()
         .run();
 }
 
-fn calculate_offset(size: f32) -> f32 {
-    0.5 * SPRITE_SCALE * SPRITE_SIZE * (size - 1.)
-}
-
-fn setup(mut commands: Commands) {
+fn setup_loading_camera(mut commands: Commands) {
     commands.spawn((
         Camera2d,
-        Name::new("main camera"),
-        Transform::from_translation(Vec3::new(
-            calculate_offset(BOARD_WIDTH as f32),
-            calculate_offset(BOARD_HEIGHT as f32).neg(),
-            0.,
-        )), // NOTE: 左上から座標が始まるようにnegにする
+        Name::new("loading_camera"),
+        StateScoped(states::GameState::Loading), // NOTE: stateが変わるとワールドから削除できる
     ));
 }
