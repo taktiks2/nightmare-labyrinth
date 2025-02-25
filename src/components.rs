@@ -23,7 +23,10 @@ pub struct Enemy;
 pub struct Goal;
 
 #[derive(Component)]
-pub struct Obstacle;
+pub struct Block;
+
+#[derive(Component)]
+pub struct Savable;
 
 #[derive(Component)]
 pub struct Attack(pub u32);

@@ -22,7 +22,7 @@ pub fn spawn_board(
                 );
                 match id {
                     1 => {
-                        utils::spawn_sprite_at(
+                        let entity = utils::spawn_sprite_at(
                             &mut commands,
                             &game_assets,
                             resources::Tile::Block,
@@ -30,6 +30,9 @@ pub fn spawn_board(
                             Some(1.),
                             Some("block".to_string()),
                         );
+                        commands
+                            .entity(entity)
+                            .insert((components::Block, components::Savable));
                     }
                     2 => {
                         let entity = utils::spawn_sprite_at(
@@ -40,31 +43,9 @@ pub fn spawn_board(
                             Some(1.),
                             Some("goal".to_string()),
                         );
-                        commands.entity(entity).insert(components::Goal);
-                    }
-                    3 => {
-                        let entity = utils::spawn_sprite_at(
-                            &mut commands,
-                            &game_assets,
-                            resources::Tile::Player,
-                            IVec2::new(x as i32, y as i32),
-                            Some(2.),
-                            Some("player".to_string()),
-                        );
                         commands
                             .entity(entity)
-                            .insert(components::Player::default());
-                    }
-                    4 => {
-                        let entity = utils::spawn_sprite_at(
-                            &mut commands,
-                            &game_assets,
-                            resources::Tile::Snake,
-                            IVec2::new(x as i32, y as i32),
-                            Some(2.),
-                            Some("enemy".to_string()),
-                        );
-                        commands.entity(entity).insert(components::Enemy);
+                            .insert((components::Goal, components::Savable));
                     }
                     5 => {
                         let entity = utils::spawn_sprite_at(
@@ -80,8 +61,42 @@ pub fn spawn_board(
                                 name: "coin".to_string(),
                                 item_type: components::ItemType::Coin,
                             },
+                            components::Savable,
                             Name::new("item"),
                         ));
+                    }
+                    _ => {}
+                }
+            }
+        }
+        for (y, row) in level.actor_board.iter().enumerate() {
+            for (x, id) in row.iter().enumerate() {
+                match id {
+                    3 => {
+                        let entity = utils::spawn_sprite_at(
+                            &mut commands,
+                            &game_assets,
+                            resources::Tile::Player,
+                            IVec2::new(x as i32, y as i32),
+                            Some(2.),
+                            Some("player".to_string()),
+                        );
+                        commands
+                            .entity(entity)
+                            .insert((components::Player::default(), components::Savable));
+                    }
+                    4 => {
+                        let entity = utils::spawn_sprite_at(
+                            &mut commands,
+                            &game_assets,
+                            resources::Tile::Snake,
+                            IVec2::new(x as i32, y as i32),
+                            Some(2.),
+                            Some("enemy".to_string()),
+                        );
+                        commands
+                            .entity(entity)
+                            .insert((components::Enemy, components::Savable));
                     }
                     _ => {}
                 }

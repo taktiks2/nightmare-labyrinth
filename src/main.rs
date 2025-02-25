@@ -54,6 +54,7 @@ fn main() {
         .add_systems(OnEnter(states::GameState::Loading), setup_loading_camera)
         .add_event::<events::GameEvent>()
         .add_event::<events::InputEvent>()
+        .add_event::<events::SaveEvent>()
         .add_event::<events::GameTick>()
         .run();
 }

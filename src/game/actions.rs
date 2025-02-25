@@ -51,11 +51,6 @@ impl Action for MoveAction {
         None
     }
     fn is_valid(&self, world: &mut World) -> bool {
-        let has_obstacle = world
-            .query_filtered::<&components::Position, With<components::Obstacle>>()
-            .iter(world)
-            .any(|pos| pos.0 == self.target); // NOTE: iterの中で一つでも適合する条件のものがあればtrueを返す
-
         if let (Some(game_assets), Some(level_assets)) = (
             world.get_resource::<resources::GameAssets>(),
             world.get_resource::<Assets<resources::Level>>(),
@@ -67,8 +62,7 @@ impl Action for MoveAction {
                 }
             }
         }
-
-        !has_obstacle
+        true
     }
 }
 

@@ -12,3 +12,6 @@ pub struct InputEvent(pub IVec2);
 
 #[derive(Event)]
 pub struct GameTick;
+
+#[derive(Event)]
+pub struct SaveEvent;

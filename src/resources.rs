@@ -16,6 +16,7 @@ pub struct GameAssets {
 #[derive(Deserialize, Serialize, Asset, TypePath)]
 pub struct Level {
     pub board: Vec<Vec<i32>>,
+    pub actor_board: Vec<Vec<i32>>,
 }
 
 #[derive(Clone, PartialEq)]
