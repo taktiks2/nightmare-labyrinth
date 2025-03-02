@@ -530,7 +530,9 @@ dependencies = [
  "anyhow",
  "bevy",
  "bevy_asset_loader_derive",
+ "bevy_common_assets",
  "path-slash",
+ "serde",
 ]
 
 [[package]]
@@ -598,6 +600,7 @@ checksum = "3521990269672c442f2bf0fbed0fce9db719e3dd136dd4012a97809464a4389d"
 dependencies = [
  "anyhow",
  "bevy",
+ "ron",
  "serde",
  "serde_json",
  "thiserror 1.0.69",

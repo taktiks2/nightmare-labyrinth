@@ -1,6 +1,7 @@
 use bevy::{color::palettes::css::*, prelude::*};
+use std::path::Path;
 
-use crate::states;
+use crate::{events, states};
 
 pub struct TitlePlugin;
 
@@ -14,6 +15,8 @@ impl Plugin for TitlePlugin {
 }
 
 fn setup_title(mut commands: Commands) {
+    let save_file_exists = Path::new("assets/save.json").exists();
+
     commands
         .spawn((
             Node {
@@ -36,17 +39,41 @@ fn setup_title(mut commands: Commands) {
         ))
         .with_children(|p| {
             p.spawn((
-                Text::new("Title"),
+                Text::new("Nightmare Labyrinth"),
                 TextFont {
                     font_size: 60.0,
                     ..default()
                 },
             ));
+            if save_file_exists {
+                p.spawn((
+                    Node {
+                        align_items: AlignItems::Center,
+                        justify_content: JustifyContent::Center,
+                        width: Val::Px(240.),
+                        height: Val::Px(60.),
+                        ..default()
+                    },
+                    BackgroundColor(BLACK.into()),
+                    BorderRadius::px(5., 5., 5., 5.),
+                    Button,
+                ))
+                .observe(handle_continue_click)
+                .with_children(|p| {
+                    p.spawn((
+                        Text::new("Continue"),
+                        TextFont {
+                            font_size: 40.0,
+                            ..default()
+                        },
+                    ));
+                });
+            }
             p.spawn((
                 Node {
                     align_items: AlignItems::Center,
                     justify_content: JustifyContent::Center,
-                    width: Val::Px(200.),
+                    width: Val::Px(240.),
                     height: Val::Px(60.),
                     ..default()
                 },
@@ -54,10 +81,10 @@ fn setup_title(mut commands: Commands) {
                 BorderRadius::px(5., 5., 5., 5.),
                 Button,
             ))
-            .observe(handle_click)
+            .observe(handle_new_game_click)
             .with_children(|p| {
                 p.spawn((
-                    Text::new("Start"),
+                    Text::new("New Game"),
                     TextFont {
                         font_size: 40.0,
                         ..default()
@@ -75,7 +102,16 @@ fn setup_title_camera(mut commands: Commands) {
     ));
 }
 
-pub fn handle_click(
+pub fn handle_continue_click(
+    _click: Trigger<Pointer<Click>>,
+    mut next_state: ResMut<NextState<states::GameState>>,
+    mut load_save_events: EventWriter<events::LoadSaveEvent>,
+) {
+    load_save_events.send(events::LoadSaveEvent);
+    next_state.set(states::GameState::Playing);
+}
+
+pub fn handle_new_game_click(
     _click: Trigger<Pointer<Click>>,
     mut next_state: ResMut<NextState<states::GameState>>,
 ) {

@@ -15,3 +15,6 @@ pub struct GameTick;
 
 #[derive(Event)]
 pub struct SaveEvent;
+
+#[derive(Event)]
+pub struct LoadSaveEvent;

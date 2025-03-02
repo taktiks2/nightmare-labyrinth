@@ -49,12 +49,16 @@ fn main() {
             // NOTE: アセットがロードされるまでローディングを出す
             LoadingState::new(states::GameState::Loading)
                 .continue_to_state(states::GameState::Title)
+                .with_dynamic_assets_file::<StandardDynamicAssetCollection>(
+                    "dynamic_asset.assets.ron",
+                )
                 .load_collection::<resources::GameAssets>(),
         )
         .add_systems(OnEnter(states::GameState::Loading), setup_loading_camera)
         .add_event::<events::GameEvent>()
         .add_event::<events::InputEvent>()
         .add_event::<events::SaveEvent>()
+        .add_event::<events::LoadSaveEvent>()
         .add_event::<events::GameTick>()
         .run();
 }

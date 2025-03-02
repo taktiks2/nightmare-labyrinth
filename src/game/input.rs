@@ -11,7 +11,8 @@ pub fn handle_keyboard_input(
         save_events.send(events::SaveEvent);
     } else if input.just_released(KeyCode::KeyW) {
         input_events.send(events::InputEvent(IVec2::NEG_Y));
-    } else if input.just_released(KeyCode::KeyS) {
+    // NOTE: Ctrl + 保存をしたときに下に移動しないようにする
+    } else if !input.pressed(KeyCode::ControlLeft) && input.just_released(KeyCode::KeyS) {
         input_events.send(events::InputEvent(IVec2::Y));
     } else if input.just_released(KeyCode::KeyD) {
         input_events.send(events::InputEvent(IVec2::X));
