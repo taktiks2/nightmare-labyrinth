@@ -1,9 +1,8 @@
 use bevy::prelude::*;
-use std::fs::File;
-use std::io::Write;
 
 use crate::components;
 use crate::events;
+use crate::game::utils::serialize_json;
 use crate::resources;
 
 pub fn save(
@@ -41,10 +40,10 @@ pub fn save(
                         current_actor_board[position.0.y as usize][position.0.x as usize] = 3
                     }
                     (_, _, _, Some(_), _) => {
-                        current_board[position.0.y as usize][position.0.x as usize] = 4
+                        current_actor_board[position.0.y as usize][position.0.x as usize] = 4
                     }
                     (_, _, _, _, Some(_)) => {
-                        current_actor_board[position.0.y as usize][position.0.x as usize] = 5
+                        current_board[position.0.y as usize][position.0.x as usize] = 5
                     }
                     _ => {}
                 };
@@ -55,31 +54,7 @@ pub fn save(
                 actor_board: current_actor_board,
             };
 
-            // マップデータをシリアライズ
-            let json_string = match serde_json::to_string_pretty(&level) {
-                Ok(json) => json,
-                Err(e) => {
-                    error!("Failed to serialize level: {}", e);
-                    return;
-                }
-            };
-
-            // ファイルの生成
-            let asset_path = "assets/save.json";
-            let mut file = match File::create(asset_path) {
-                Ok(file) => file,
-                Err(e) => {
-                    error!("Failed to create file: {}", e);
-                    return;
-                }
-            };
-
-            // ファイルに書き込み
-            if let Err(e) = file.write_all(json_string.as_bytes()) {
-                error!("Failed to write to file: {}", e);
-            } else {
-                info!("Map saved to {}", asset_path);
-            }
+            let _ = serialize_json(&level, "assets/save.json");
         } else {
             error!("Current level not found!");
         }

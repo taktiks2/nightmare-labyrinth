@@ -20,7 +20,7 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             OnEnter(states::GameState::Playing),
-            (setup_game_camera, board::spawn_board),
+            (setup_game_camera, board::setup_board),
         )
         .add_systems(
             Update,

@@ -9,7 +9,7 @@ use crate::components;
 pub struct GameAssets {
     #[asset(path = "nightmare-labyrinth.aseprite")]
     pub aseprite: Handle<Aseprite>,
-    #[asset(path = "level.json")]
+    #[asset(key = "level")] // ビルド時ではなく、実行時にアセットをロードする
     pub level: Handle<Level>,
 }
 
