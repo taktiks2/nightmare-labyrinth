@@ -5,6 +5,7 @@ use std::ops::Neg;
 mod actions;
 mod board;
 mod input;
+mod menu;
 mod save;
 mod utils;
 
@@ -20,7 +21,7 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             OnEnter(states::GameState::Playing),
-            (setup_game_camera, board::setup_board),
+            (setup_game_camera, board::setup_board, menu::setup_menu),
         )
         .add_systems(
             Update,
@@ -43,27 +44,17 @@ impl Plugin for GamePlugin {
     }
 }
 
-fn setup_game_camera(
-    mut commands: Commands,
-    game_assets: Res<resources::GameAssets>,
-    levels: Res<Assets<resources::Level>>,
-) {
-    if let Some(level) = levels.get(&game_assets.level) {
-        commands.spawn((
-            Camera2d,
-            Name::new("game_camera"),
-            StateScoped(states::GameState::Loading), // NOTE: stateが変わるとワールドから削除できる
-            Transform::from_translation(Vec3::new(
-                calculate_offset(level.board[0].len() as f32),
-                calculate_offset(level.board.len() as f32).neg(),
-                0.,
-            )), // NOTE: 左上から座標が始まるようにnegにする
-        ));
-    }
-}
-
-fn calculate_offset(size: f32) -> f32 {
-    0.5 * globals::SPRITE_SCALE * globals::SPRITE_SIZE * (size - 1.)
+fn setup_game_camera(mut commands: Commands) {
+    commands.spawn((
+        Camera2d,
+        Name::new("game_camera"),
+        Transform::from_translation(Vec3::new(
+            globals::WINDOW_WIDTH / 2. - globals::SPRITE_SIZE / 2.,
+            (globals::WINDOW_HEIGHT / 2. - globals::SPRITE_SIZE / 2.).neg(),
+            0.,
+        )), // NOTE: 左上から座標が始まるようにnegにする
+        StateScoped(states::GameState::Loading), // NOTE: stateが変わるとワールドから削除できる
+    ));
 }
 
 #[derive(Resource)]
