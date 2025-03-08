@@ -20,6 +20,8 @@ fn main() {
                 .set(WindowPlugin {
                     primary_window: Some(Window {
                         title: "Nightmare Labyrinth".to_string(),
+                        resolution: [globals::WINDOW_WIDTH, globals::WINDOW_HEIGHT].into(), // NOTE: Windowサイズの指定
+                        resizable: false, // NOTE: Windowサイズの変更を不可にする
                         ..default()
                     }),
                     ..default()
