@@ -55,7 +55,6 @@ pub fn setup_menu(mut commands: Commands) {
             parent.spawn((
                 Text::new("Attack: ".to_string()),
                 TextFont {
-                    // font: game_assets.font_regular.clone(),
                     font_size: 30.0,
                     ..default()
                 },
@@ -64,7 +63,6 @@ pub fn setup_menu(mut commands: Commands) {
             parent.spawn((
                 Text::new("Defense: ".to_string()),
                 TextFont {
-                    // font: game_assets.font_regular.clone(),
                     font_size: 30.0,
                     ..default()
                 },
@@ -73,7 +71,6 @@ pub fn setup_menu(mut commands: Commands) {
             parent.spawn((
                 Text::new("Gold: ".to_string()),
                 TextFont {
-                    // font: game_assets.font_regular.clone(),
                     font_size: 30.0,
                     ..default()
                 },
