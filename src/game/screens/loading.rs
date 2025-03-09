@@ -1,13 +1,9 @@
 use bevy::{color::palettes::css::*, prelude::*};
 
-use crate::states;
+use crate::game::states;
 
-pub struct LoadingPlugin;
-
-impl Plugin for LoadingPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(states::GameState::Loading), setup_loading);
-    }
+pub(super) fn plugin(app: &mut App) {
+    app.add_systems(OnEnter(states::GameState::Loading), setup_loading);
 }
 
 fn setup_loading(mut commands: Commands) {

@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::events;
+use crate::game::events;
 
 pub fn handle_keyboard_input(
     input: Res<ButtonInput<KeyCode>>,

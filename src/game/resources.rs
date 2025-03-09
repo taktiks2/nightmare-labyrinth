@@ -1,9 +1,10 @@
-use bevy::prelude::*;
+use bevy::{ecs::system::SystemId, prelude::*};
 use bevy_aseprite_ultra::prelude::*;
 use bevy_asset_loader::asset_collection::AssetCollection;
 use serde::{Deserialize, Serialize};
+use std::collections::VecDeque;
 
-use crate::components;
+use crate::game::{actions, components};
 
 #[derive(Resource, AssetCollection)]
 pub struct GameAssets {
@@ -59,4 +60,23 @@ impl FromWorld for Inventory {
     fn from_world(_world: &mut World) -> Self {
         Self { items: vec![] }
     }
+}
+
+#[derive(Resource)]
+pub struct QueueSystems {
+    pub collect_actor_queue: SystemId,
+    pub handle_actor_queue: SystemId,
+}
+
+#[derive(Resource, Default)]
+pub struct ActionQueue(pub VecDeque<Box<dyn actions::Action>>);
+
+#[derive(Resource, Default)]
+pub struct ActorQueue(pub VecDeque<Entity>);
+
+pub(super) fn plugin(app: &mut App) {
+    app.init_resource::<Inventory>()
+        .init_resource::<QueueSystems>()
+        .init_resource::<ActionQueue>()
+        .init_resource::<ActorQueue>();
 }

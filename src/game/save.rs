@@ -1,9 +1,6 @@
 use bevy::prelude::*;
 
-use crate::components;
-use crate::events;
-use crate::game::utils::serialize_json;
-use crate::resources;
+use crate::game::{components, events, resources, utils};
 
 pub fn save(
     mut save_events: EventReader<events::SaveEvent>,
@@ -54,7 +51,7 @@ pub fn save(
                 actor_board: current_actor_board,
             };
 
-            let _ = serialize_json(&level, "assets/save.json");
+            let _ = utils::serialize_json(&level, "assets/save.json");
         } else {
             error!("Current level not found!");
         }

@@ -18,3 +18,11 @@ pub struct SaveEvent;
 
 #[derive(Event)]
 pub struct LoadSaveEvent;
+
+pub(super) fn plugin(app: &mut App) {
+    app.add_event::<GameEvent>()
+        .add_event::<InputEvent>()
+        .add_event::<SaveEvent>()
+        .add_event::<LoadSaveEvent>()
+        .add_event::<GameTick>();
+}
