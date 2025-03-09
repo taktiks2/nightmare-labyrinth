@@ -1,13 +1,13 @@
 use bevy::{color::palettes::css::*, prelude::*};
 use std::path::Path;
 
-use crate::game::{events, states};
+use crate::game::{events, resources, states};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(states::GameState::Title), setup_title);
 }
 
-fn setup_title(mut commands: Commands) {
+fn setup_title(mut commands: Commands, game_assets: Res<resources::GameAssets>) {
     let save_file_exists = Path::new("assets/save.json").exists();
 
     commands
@@ -32,8 +32,9 @@ fn setup_title(mut commands: Commands) {
         ))
         .with_children(|p| {
             p.spawn((
-                Text::new("Nightmare Labyrinth"),
+                Text::new("悪夢の迷宮"),
                 TextFont {
+                    font: game_assets.font_bold.clone(),
                     font_size: 60.0,
                     ..default()
                 },

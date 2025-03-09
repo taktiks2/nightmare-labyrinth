@@ -8,6 +8,10 @@ use crate::game::{actions, components};
 
 #[derive(Resource, AssetCollection)]
 pub struct GameAssets {
+    #[asset(path = "fonts/NotoSansJP-Regular.ttf")]
+    pub font_regular: Handle<Font>,
+    #[asset(path = "fonts/NotoSansJP-Bold.ttf")]
+    pub font_bold: Handle<Font>,
     #[asset(path = "nightmare-labyrinth.aseprite")]
     pub aseprite: Handle<Aseprite>,
     #[asset(key = "level")] // ビルド時ではなく、実行時にアセットをロードする
