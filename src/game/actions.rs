@@ -1,8 +1,6 @@
 use bevy::prelude::*;
 
-use crate::components;
-use crate::events;
-use crate::resources;
+use crate::game::{components, events, resources};
 
 pub fn get_enemy_action(entity: Entity, world: &mut World) -> Option<Box<dyn Action>> {
     let position = world.get::<components::Position>(entity)?.0;

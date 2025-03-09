@@ -1,17 +1,10 @@
 use bevy::{color::palettes::css::*, prelude::*};
 use std::path::Path;
 
-use crate::{events, states};
+use crate::game::{events, states};
 
-pub struct TitlePlugin;
-
-impl Plugin for TitlePlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(
-            OnEnter(states::GameState::Title),
-            (setup_title_camera, setup_title),
-        );
-    }
+pub(super) fn plugin(app: &mut App) {
+    app.add_systems(OnEnter(states::GameState::Title), setup_title);
 }
 
 fn setup_title(mut commands: Commands) {
@@ -92,14 +85,6 @@ fn setup_title(mut commands: Commands) {
                 ));
             });
         });
-}
-
-fn setup_title_camera(mut commands: Commands) {
-    commands.spawn((
-        Camera2d,
-        Name::new("title_camera"),
-        StateScoped(states::GameState::Title), // NOTE: stateが変わるとワールドから削除できる
-    ));
 }
 
 pub fn handle_continue_click(

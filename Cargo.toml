@@ -3,6 +3,13 @@ name = "nightmare-labyrinth"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+dev = [
+  # Improve compile times for dev builds by linking Bevy as a dynamic library.
+  "bevy/dynamic_linking",
+  "bevy/bevy_dev_tools",
+]
+
 [dependencies]
 bevy = "0.15.1"
 bevy-inspector-egui = "0.28.1"

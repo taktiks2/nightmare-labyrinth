@@ -6,10 +6,10 @@ use std::fs::File;
 use std::io::{BufReader, Write};
 use std::ops::Neg;
 
-use crate::components;
-use crate::globals;
-use crate::resources;
-use crate::states;
+use crate::{
+    game::{components, resources, states},
+    globals,
+};
 
 pub fn spawn_sprite_at(
     commands: &mut Commands,

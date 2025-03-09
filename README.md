@@ -42,3 +42,9 @@ Appに以下の設定を追加
 ```
 
 https://stackoverflow.com/a/78945047
+
+## デバッグモードでの起動方法
+
+```sh
+cargo run --features dev
+```
