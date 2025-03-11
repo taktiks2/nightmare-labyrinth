@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Bevy New 2D</title>
+    <title>Nightmare Labyrinth</title>
     <link data-trunk rel="copy-dir" href="../assets" />
     <link data-trunk rel="inline" href="style.css" />
     <link
@@ -13,27 +13,7 @@
       href="../"
     />
   </head>
-
   <body>
-    <div id="game" class="center">
-      <div id="loading-screen" class="center">
-        <span class="spinner"></span>
-      </div>
-
-      <canvas id="bevy"> Javascript and canvas support is required </canvas>
-    </div>
     <script type="module" src="restart-audio-context.js"></script>
-    <script type="module">
-      // Hide loading screen when the game starts.
-      const loading_screen = document.getElementById("loading-screen");
-      const bevy = document.getElementById("bevy");
-      const observer = new MutationObserver(() => {
-        if (bevy.height > 1) {
-          loading_screen.style.display = "none";
-          observer.disconnect();
-        }
-      });
-      observer.observe(bevy, { attributeFilter: ["height"] });
-    </script>
   </body>
 </html>
