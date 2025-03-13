@@ -7,7 +7,6 @@ on:
       - feat/30-release-flow
 
 env:
-  # update with the name of the main binary
   binary: nightmare-labyrinth
   itch_target: taktiks2/nightmare-labyrinth
   # Before enabling LFS, please take a look at GitHub's documentation for costs and quota limits:
