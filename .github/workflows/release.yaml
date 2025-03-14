@@ -3,8 +3,7 @@ name: Release
 on:
   push:
     branches:
-      # - main
-      - feat/30-release-flow
+      - main
 
 env:
   binary: nightmare-labyrinth
@@ -33,7 +32,7 @@ jobs:
           cargo binstall trunk --no-confirm
       - name: Build
         run: |
-          trunk build --release
+          trunk build --release --config Trunk.build.toml
       - name: Package as a zip
         working-directory: ./target/trunk
         run: |
