@@ -93,7 +93,7 @@ pub fn handle_continue_click(
     mut next_state: ResMut<NextState<states::GameState>>,
     mut load_save_events: EventWriter<events::LoadSaveEvent>,
 ) {
-    load_save_events.send(events::LoadSaveEvent);
+    load_save_events.write(events::LoadSaveEvent);
     next_state.set(states::GameState::Playing);
 }
 

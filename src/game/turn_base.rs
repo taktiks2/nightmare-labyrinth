@@ -17,7 +17,7 @@ pub fn collect_actor_queue(
     mut queue: ResMut<resources::ActorQueue>,
 ) {
     queue.0 = enemy_query.iter().collect();
-    if let Ok(player) = player_query.get_single() {
+    if let Ok(player) = player_query.single() {
         queue.0.push_front(player);
     }
 }
@@ -79,7 +79,7 @@ pub fn handle_input_events(
     mut query: Query<(&mut components::Player, &components::Position)>,
 ) {
     for event in events.read() {
-        if let Ok((mut player, position)) = query.get_single_mut() {
+        if let Ok((mut player, position)) = query.single_mut() {
             player.0 = Some(position.0 + event.0);
         }
     }
@@ -101,15 +101,15 @@ pub fn handle_game_events(
                         utils::position_to_translation(*target, Some(transform.translation.z))
                 }
             }
-            events::GameEvent::Attack(entity, target) => {}
+            events::GameEvent::Attack(_entity, _target) => {}
             events::GameEvent::Collect(entity) => {
                 if let Ok(item) = items.get(*entity) {
                     inventory.items.push(item.clone());
                 }
-                commands.entity(*entity).despawn_recursive();
+                commands.entity(*entity).despawn();
                 debug!("{:?}", inventory);
             }
         }
     }
-    tick_events.send(events::GameTick);
+    tick_events.write(events::GameTick);
 }
