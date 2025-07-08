@@ -1,9 +1,21 @@
+//! ゲーム画面管理システム
+//!
+//! ゲームの各画面（シーン）を管理するモジュール
+//! ローディング、タイトル、ゲームプレイの各画面を含む
+//! 状態に応じて適切な画面を表示し、UIやシステムを管理
+
 use bevy::prelude::*;
 
-mod home;
-mod loading;
-mod title;
+// ゲーム画面モジュール
+mod home; // メインゲーム画面
+mod loading; // ローディング画面
+mod title; // タイトル画面
 
+/// ゲーム画面プラグイン
+///
+/// すべてのゲーム画面を統合し、アプリケーションに登録する
+/// 各画面は状態に応じて自動的に有効/無効が切り替わる
 pub(super) fn plugin(app: &mut App) {
+    // 各画面のプラグインを登録（ローディング、タイトル、メインゲーム）
     app.add_plugins((loading::plugin, title::plugin, home::plugin));
 }
