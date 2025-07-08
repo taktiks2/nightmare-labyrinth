@@ -12,7 +12,7 @@ use crate::{
 };
 
 /// 指定位置にスプライトエンティティを生成
-/// 
+///
 /// Asepriteアセットを使用してスプライトを生成し、位置・スケール・状態を設定
 /// ゲーム内オブジェクトの基本的な生成処理を担当
 pub fn spawn_sprite_at(
@@ -23,31 +23,32 @@ pub fn spawn_sprite_at(
     z: Option<f32>,
     name: Option<String>,
 ) -> Entity {
-    let mut entity_commands = commands.spawn((
-        // Asepriteスライスの設定
-        AseSpriteSlice {
-            name: tile.as_string(),
-            aseprite: game_assets.aseprite.clone(),
-        },
-        // 位置とスケールの設定
-        Transform::from_translation(position_to_translation(position, z))
-            .with_scale(Vec3::new(globals::SPRITE_SCALE, globals::SPRITE_SCALE, 1.)),
-        // ゲーム状態に応じた自動削除の設定
-        StateScoped(states::GameState::Playing),
-        // ゲーム内座標の設定
-        components::Position(IVec2::new(position.x, position.y)),
-    ));
-    
+    let mut entity_commands =
+        commands.spawn((
+            // Asepriteスライスの設定
+            AseSpriteSlice {
+                name: tile.as_string(),
+                aseprite: game_assets.aseprite.clone(),
+            },
+            // 位置とスケールの設定
+            Transform::from_translation(position_to_translation(position, z))
+                .with_scale(Vec3::new(globals::SPRITE_SCALE, globals::SPRITE_SCALE, 1.)),
+            // ゲーム状態に応じた自動削除の設定
+            StateScoped(states::GameState::Playing),
+            // ゲーム内座標の設定
+            components::Position(IVec2::new(position.x, position.y)),
+        ));
+
     // 名前が指定されている場合は設定
     if let Some(name) = name {
         entity_commands.insert(Name::new(name));
     }
-    
+
     entity_commands.id()
 }
 
 /// ゲーム座標をワールド座標に変換
-/// 
+///
 /// グリッドベースのゲーム座標（IVec2）を画面上の実際の座標（Vec3）に変換
 /// Y軸を反転させてピクセルアートの標準的な座標系に対応
 pub fn position_to_translation(position: IVec2, z: Option<f32>) -> Vec3 {
@@ -62,7 +63,7 @@ pub fn position_to_translation(position: IVec2, z: Option<f32>) -> Vec3 {
 }
 
 /// JSONファイルからRust構造体へのデシリアライゼーション
-/// 
+///
 /// 指定されたパスのJSONファイルを読み込み、型Tの構造体に変換
 /// セーブデータやゲーム設定の読み込みに使用
 pub fn deserialize_json<T>(path: &str) -> Result<T, serde_json::Error>
@@ -76,7 +77,7 @@ where
 }
 
 /// Rust構造体からJSONファイルへのシリアライゼーション
-/// 
+///
 /// 型Tの構造体をJSONファイルとして指定パスに保存
 /// セーブデータやゲーム設定の書き込みに使用
 pub fn serialize_json<T>(data: &T, path: &str) -> Result<(), serde_json::Error>
@@ -85,11 +86,11 @@ where
 {
     // 読みやすい形式でJSON文字列を生成
     let json_string = serde_json::to_string_pretty(data)?;
-    
+
     // ファイルを作成して書き込み
     let mut file = File::create(path).expect("Failed to create file");
     file.write_all(json_string.as_bytes())
         .expect("Failed to write to file");
-    
+
     Ok(())
 }

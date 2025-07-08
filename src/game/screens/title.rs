@@ -11,7 +11,7 @@ use std::path::Path;
 use crate::game::{events, resources, states};
 
 /// タイトル画面プラグイン
-/// 
+///
 /// Title状態に入った時にタイトル画面を表示するシステムを登録
 /// メインメニューの表示とユーザー操作を処理
 pub(super) fn plugin(app: &mut App) {
@@ -20,11 +20,11 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 /// タイトル画面のUIをセットアップ
-/// 
+///
 /// ゲームタイトル、メニューボタンを含むメインメニューを作成
 /// セーブファイルの存在をチェックし、あればContinueボタンを表示
 /// 常にNew Gameボタンを表示し、ゲームの新規開始を可能にする
-/// 
+///
 /// # 引数
 /// * `commands` - EntityとComponentをスポーンするためのコマンド
 /// * `game_assets` - ゲームアセット（フォントなど）へのアクセス
@@ -69,10 +69,39 @@ fn setup_title(mut commands: Commands, game_assets: Res<resources::GameAssets>) 
                     ..default()
                 },
             ));
-            
+
             // セーブファイルがある場合はContinueボタンを表示
             if save_file_exists {
-                parent.spawn((
+                parent
+                    .spawn((
+                        Node {
+                            align_items: AlignItems::Center,
+                            justify_content: JustifyContent::Center,
+                            width: Val::Px(240.),
+                            height: Val::Px(60.),
+                            ..default()
+                        },
+                        // 黒い背景と丸みを帯びたボタン
+                        BackgroundColor(BLACK.into()),
+                        BorderRadius::px(5., 5., 5., 5.),
+                        Button,
+                    ))
+                    // Continueボタンのクリックイベントを監視
+                    .observe(handle_continue_click)
+                    .with_children(|child| {
+                        child.spawn((
+                            Text::new("Continue"),
+                            TextFont {
+                                font_size: 40.0,
+                                ..default()
+                            },
+                        ));
+                    });
+            }
+
+            // New Gameボタンを常に表示
+            parent
+                .spawn((
                     Node {
                         align_items: AlignItems::Center,
                         justify_content: JustifyContent::Center,
@@ -85,52 +114,25 @@ fn setup_title(mut commands: Commands, game_assets: Res<resources::GameAssets>) 
                     BorderRadius::px(5., 5., 5., 5.),
                     Button,
                 ))
-                // Continueボタンのクリックイベントを監視
-                .observe(handle_continue_click)
+                // New Gameボタンのクリックイベントを監視
+                .observe(handle_new_game_click)
                 .with_children(|child| {
                     child.spawn((
-                        Text::new("Continue"),
+                        Text::new("New Game"),
                         TextFont {
                             font_size: 40.0,
                             ..default()
                         },
                     ));
                 });
-            }
-            
-            // New Gameボタンを常に表示
-            parent.spawn((
-                Node {
-                    align_items: AlignItems::Center,
-                    justify_content: JustifyContent::Center,
-                    width: Val::Px(240.),
-                    height: Val::Px(60.),
-                    ..default()
-                },
-                // 黒い背景と丸みを帯びたボタン
-                BackgroundColor(BLACK.into()),
-                BorderRadius::px(5., 5., 5., 5.),
-                Button,
-            ))
-            // New Gameボタンのクリックイベントを監視
-            .observe(handle_new_game_click)
-            .with_children(|child| {
-                child.spawn((
-                    Text::new("New Game"),
-                    TextFont {
-                        font_size: 40.0,
-                        ..default()
-                    },
-                ));
-            });
         });
 }
 
 /// Continueボタンのクリックイベントを処理
-/// 
+///
 /// セーブデータのロードイベントを発行し、ゲーム状態をPlayingに変更
 /// セーブファイルが存在する場合のみ表示されるボタンの処理
-/// 
+///
 /// # 引数
 /// * `_click` - クリックイベントトリガー（未使用）
 /// * `next_state` - ゲーム状態を変更するためのリソース
@@ -147,10 +149,10 @@ pub fn handle_continue_click(
 }
 
 /// New Gameボタンのクリックイベントを処理
-/// 
+///
 /// 新規ゲームを開始し、ゲーム状態をPlayingに変更
 /// セーブデータのロードは行わず、新しいゲームを開始
-/// 
+///
 /// # 引数
 /// * `_click` - クリックイベントトリガー（未使用）
 /// * `next_state` - ゲーム状態を変更するためのリソース

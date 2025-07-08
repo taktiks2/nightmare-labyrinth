@@ -41,15 +41,17 @@ pub fn save(
 
                 // コンポーネントの種類に応じて適切な盤面に配置
                 match (block, goal, player, enemy, item) {
-                    (Some(_), _, _, _, _) => set_tile(&mut current_board, pos, TileType::Block),
-                    (_, Some(_), _, _, _) => set_tile(&mut current_board, pos, TileType::Goal),
-                    (_, _, Some(_), _, _) => {
+                    (Some(_block), _, _, _, _) => {
+                        set_tile(&mut current_board, pos, TileType::Block)
+                    }
+                    (_, Some(_goal), _, _, _) => set_tile(&mut current_board, pos, TileType::Goal),
+                    (_, _, Some(_player), _, _) => {
                         set_tile(&mut current_actor_board, pos, TileType::Player)
                     }
-                    (_, _, _, Some(_), _) => {
+                    (_, _, _, Some(_enemy), _) => {
                         set_tile(&mut current_actor_board, pos, TileType::Enemy)
                     }
-                    (_, _, _, _, Some(_)) => set_tile(&mut current_board, pos, TileType::Item),
+                    (_, _, _, _, Some(_item)) => set_tile(&mut current_board, pos, TileType::Item),
                     _ => {} // 該当なしの場合は何もしない
                 }
             }
