@@ -70,8 +70,22 @@ pub fn setup_board(
 
     if is_load_save {
         // セーブファイルからレベルデータを読み込み
-        let level = utils::deserialize_json::<resources::Level>("assets/save.json").unwrap();
-        spawn_board(&mut commands, &level, &game_assets);
+        match utils::deserialize_json::<resources::Level>("assets/save.json") {
+            Ok(level) => {
+                spawn_board(&mut commands, &level, &game_assets);
+            }
+            Err(e) => {
+                error!("セーブファイルの読み込みに失敗しました: {:#}", e);
+
+                // エラー表示イベントは現在のシステムでは簡単に送信できないため、
+                // ログ出力で代替（将来的にはイベントシステムの改善が必要）
+
+                // セーブファイルが読み込めない場合はデフォルトレベルを使用
+                if let Some(level) = levels.get(&game_assets.level) {
+                    spawn_board(&mut commands, &level, &game_assets);
+                }
+            }
+        }
     } else if let Some(level) = levels.get(&game_assets.level) {
         // デフォルトレベルを使用
         spawn_board(&mut commands, &level, &game_assets);

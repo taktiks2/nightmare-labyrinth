@@ -65,7 +65,7 @@ pub fn save(
             // JSONファイルに保存
             match utils::serialize_json(&save_level, "assets/save.json") {
                 Ok(_) => info!("ゲームデータを正常に保存しました"),
-                Err(e) => error!("保存に失敗しました: {:?}", e),
+                Err(e) => error!("保存に失敗しました: {:#}", e),
             }
         } else {
             error!("現在のレベルが見つかりません");

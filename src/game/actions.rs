@@ -104,7 +104,15 @@ impl Action for MoveAction {
         }
 
         // エンティティの位置を更新
-        world.get_mut::<components::Position>(self.entity)?.0 = self.target;
+        if let Some(mut position) = world.get_mut::<components::Position>(self.entity) {
+            position.0 = self.target;
+        } else {
+            error!(
+                "エンティティ {:?} の Position コンポーネントが見つかりません",
+                self.entity
+            );
+            return None;
+        }
 
         // 移動イベントを発生
         world.send_event::<events::GameEvent>(events::GameEvent::Move(self.entity, self.target));
