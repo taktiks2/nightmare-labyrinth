@@ -57,51 +57,23 @@ fn setup_title(mut commands: Commands, game_assets: Res<resources::GameAssets>) 
             StateScoped(states::GameState::Title),
             // グレーの背景色
             BackgroundColor(GRAY.into()),
+            children![
+                // ゲームタイトルを表示
+                (
+                    Text::new("悪夢の迷宮"),
+                    TextFont {
+                        // 太字フォントを使用
+                        font: game_assets.font_bold.clone(),
+                        font_size: 60.0,
+                        ..default()
+                    },
+                ),
+            ],
         ))
         .with_children(|parent| {
-            // ゲームタイトルを表示
-            parent.spawn((
-                Text::new("悪夢の迷宮"),
-                TextFont {
-                    // 太字フォントを使用
-                    font: game_assets.font_bold.clone(),
-                    font_size: 60.0,
-                    ..default()
-                },
-            ));
-
             // セーブファイルがある場合はContinueボタンを表示
             if save_file_exists {
-                parent
-                    .spawn((
-                        Node {
-                            align_items: AlignItems::Center,
-                            justify_content: JustifyContent::Center,
-                            width: Val::Px(240.),
-                            height: Val::Px(60.),
-                            ..default()
-                        },
-                        // 黒い背景と丸みを帯びたボタン
-                        BackgroundColor(BLACK.into()),
-                        BorderRadius::px(5., 5., 5., 5.),
-                        Button,
-                    ))
-                    // Continueボタンのクリックイベントを監視
-                    .observe(handle_continue_click)
-                    .with_children(|child| {
-                        child.spawn((
-                            Text::new("Continue"),
-                            TextFont {
-                                font_size: 40.0,
-                                ..default()
-                            },
-                        ));
-                    });
-            }
-
-            // New Gameボタンを常に表示
-            parent
-                .spawn((
+                parent.spawn((
                     Node {
                         align_items: AlignItems::Center,
                         justify_content: JustifyContent::Center,
@@ -113,18 +85,41 @@ fn setup_title(mut commands: Commands, game_assets: Res<resources::GameAssets>) 
                     BackgroundColor(BLACK.into()),
                     BorderRadius::px(5., 5., 5., 5.),
                     Button,
-                ))
-                // New Gameボタンのクリックイベントを監視
-                .observe(handle_new_game_click)
-                .with_children(|child| {
-                    child.spawn((
-                        Text::new("New Game"),
+                    children![(
+                        Text::new("Continue"),
                         TextFont {
                             font_size: 40.0,
                             ..default()
                         },
-                    ));
-                });
+                    )],
+                    Observer::new(handle_continue_click),
+                ));
+                // Continueボタンのクリックイベントを監視
+            }
+            // New Gameボタンを常に表示
+
+            parent.spawn((
+                Node {
+                    align_items: AlignItems::Center,
+                    justify_content: JustifyContent::Center,
+                    width: Val::Px(240.),
+                    height: Val::Px(60.),
+                    ..default()
+                },
+                // 黒い背景と丸みを帯びたボタン
+                BackgroundColor(BLACK.into()),
+                BorderRadius::px(5., 5., 5., 5.),
+                Button,
+                children![(
+                    Text::new("New Game"),
+                    TextFont {
+                        font_size: 40.0,
+                        ..default()
+                    },
+                )],
+                Observer::new(handle_new_game_click),
+            ));
+            // New Gameボタンのクリックイベントを監視
         });
 }
 
