@@ -3,6 +3,7 @@
 //! Bevyのイベントシステムを使用したゲームイベントの定義
 //! システム間の通信とゲームロジックの結合を担当
 
+use anyhow::Error;
 use bevy::prelude::*;
 
 /// ゲームアクションイベント
@@ -48,6 +49,15 @@ pub struct SaveEvent;
 #[derive(Event)]
 pub struct LoadSaveEvent;
 
+/// エラー表示イベント
+///
+/// ゲーム内でエラーが発生した際に表示するイベント
+#[derive(Event)]
+pub struct ErrorDisplayEvent {
+    pub error: Error,
+    pub duration: f32, // 表示時間（秒）
+}
+
 /// イベントシステムプラグイン
 ///
 /// ゲームで使用するすべてのイベントをアプリケーションに登録
@@ -56,5 +66,6 @@ pub(super) fn plugin(app: &mut App) {
         .add_event::<InputEvent>()
         .add_event::<SaveEvent>()
         .add_event::<LoadSaveEvent>()
+        .add_event::<ErrorDisplayEvent>()
         .add_event::<GameTick>();
 }

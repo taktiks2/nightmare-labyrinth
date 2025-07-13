@@ -7,7 +7,7 @@ use std::io::{BufReader, Write};
 use std::ops::Neg;
 
 use crate::{
-    game::{components, resources, states},
+    game::{components, errors, resources, states},
     globals,
 };
 
@@ -66,13 +66,16 @@ pub fn position_to_translation(position: IVec2, z: Option<f32>) -> Vec3 {
 ///
 /// 指定されたパスのJSONファイルを読み込み、型Tの構造体に変換
 /// セーブデータやゲーム設定の読み込みに使用
-pub fn deserialize_json<T>(path: &str) -> Result<T, serde_json::Error>
+pub fn deserialize_json<T>(path: &str) -> errors::GameResult<T>
 where
     T: DeserializeOwned,
 {
-    let file = File::open(path).unwrap();
+    use errors::GameContextExt;
+
+    let file = File::open(path).with_file_context(path, "読み込み")?;
     let reader = BufReader::new(file);
-    let target: T = serde_json::from_reader(reader)?;
+    let target: T =
+        serde_json::from_reader(reader).with_json_context(path, "デシリアライゼーション")?;
     Ok(target)
 }
 
@@ -80,17 +83,20 @@ where
 ///
 /// 型Tの構造体をJSONファイルとして指定パスに保存
 /// セーブデータやゲーム設定の書き込みに使用
-pub fn serialize_json<T>(data: &T, path: &str) -> Result<(), serde_json::Error>
+pub fn serialize_json<T>(data: &T, path: &str) -> errors::GameResult<()>
 where
     T: Serialize,
 {
+    use errors::GameContextExt;
+
     // 読みやすい形式でJSON文字列を生成
-    let json_string = serde_json::to_string_pretty(data)?;
+    let json_string =
+        serde_json::to_string_pretty(data).with_json_context(path, "シリアライゼーション")?;
 
     // ファイルを作成して書き込み
-    let mut file = File::create(path).expect("Failed to create file");
+    let mut file = File::create(path).with_file_context(path, "作成")?;
     file.write_all(json_string.as_bytes())
-        .expect("Failed to write to file");
+        .with_file_context(path, "書き込み")?;
 
     Ok(())
 }

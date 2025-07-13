@@ -13,6 +13,8 @@ use bevy::prelude::*;
 mod actions; // アクションシステム
 mod assets; // アセット管理
 mod components; // ECSコンポーネント
+mod error_display; // エラー表示システム
+mod errors; // エラー型定義
 mod events; // ゲームイベント
 mod input; // 入力処理
 mod resources; // リソース管理
@@ -28,10 +30,11 @@ mod utils; // ユーティリティ関数
 pub(super) fn plugin(app: &mut App) {
     // ゲームシステムを初期化し、必要なプラグインを追加
     app.add_plugins((
-        assets::plugin,    // アセットローダー
-        events::plugin,    // イベントシステム
-        states::plugin,    // ゲーム状態管理
-        resources::plugin, // リソース管理
-        screens::plugin,   // ゲーム画面
+        assets::plugin,        // アセットローダー
+        error_display::plugin, // エラー表示システム
+        events::plugin,        // イベントシステム
+        states::plugin,        // ゲーム状態管理
+        resources::plugin,     // リソース管理
+        screens::plugin,       // ゲーム画面
     ));
 }
