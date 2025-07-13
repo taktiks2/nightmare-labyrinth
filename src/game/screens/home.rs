@@ -254,26 +254,24 @@ fn spawn_actor(
 /// * `commands` - EntityとComponentをスポーンするためのコマンド
 pub fn setup_menu(mut commands: Commands) {
     // サイドメニュー（画面右端の情報パネル）
-    commands
-        .spawn((
-            Node {
-                // 絶対位置で画面右端に固定
-                position_type: PositionType::Absolute,
-                top: Val::Px(0.),
-                right: Val::Px(0.),
-                width: Val::Px(SIDE_MENU_WIDTH),
-                height: Val::Percent(100.),
-                // コンテンツを中央に縦並びで配置
-                align_items: AlignItems::Center,
-                justify_content: JustifyContent::Center,
-                flex_direction: FlexDirection::Column,
-                ..default()
-            },
-            BackgroundColor(GRAY.into()),
-        ))
-        .with_children(|parent| {
+    commands.spawn((
+        Node {
+            // 絶対位置で画面右端に固定
+            position_type: PositionType::Absolute,
+            top: Val::Px(0.),
+            right: Val::Px(0.),
+            width: Val::Px(SIDE_MENU_WIDTH),
+            height: Val::Percent(100.),
+            // コンテンツを中央に縦並びで配置
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
+            flex_direction: FlexDirection::Column,
+            ..default()
+        },
+        BackgroundColor(GRAY.into()),
+        children![
             // プレースホルダー要素（将来的にインベントリ表示などを追加予定）
-            parent.spawn((
+            (
                 Node {
                     align_items: AlignItems::Center,
                     justify_content: JustifyContent::Center,
@@ -283,53 +281,53 @@ pub fn setup_menu(mut commands: Commands) {
                 },
                 BorderRadius::px(5., 5., 5., 5.),
                 BackgroundColor(BLACK.into()),
-            ));
-        });
+            )
+        ],
+    ));
 
     // ボトムステータスバー（画面下部のプレイヤーステータス表示）
-    commands
-        .spawn((
-            Node {
-                // 絶対位置で画面下部に固定（サイドメニューを除いた幅）
-                position_type: PositionType::Absolute,
-                bottom: Val::Px(0.),
-                left: Val::Px(0.),
-                width: Val::Px(globals::WINDOW_WIDTH - SIDE_MENU_WIDTH),
-                height: Val::Px(BOTTOM_TAB_HEIGHT),
-                // コンテンツを中央に均等配置
-                align_items: AlignItems::Center,
-                justify_content: JustifyContent::SpaceEvenly,
-                ..default()
-            },
-            BackgroundColor(GRAY.into()),
-        ))
-        .with_children(|parent| {
+    commands.spawn((
+        Node {
+            // 絶対位置で画面下部に固定（サイドメニューを除いた幅）
+            position_type: PositionType::Absolute,
+            bottom: Val::Px(0.),
+            left: Val::Px(0.),
+            width: Val::Px(globals::WINDOW_WIDTH - SIDE_MENU_WIDTH),
+            height: Val::Px(BOTTOM_TAB_HEIGHT),
+            // コンテンツを中央に均等配置
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::SpaceEvenly,
+            ..default()
+        },
+        BackgroundColor(GRAY.into()),
+        children![
             // 攻撃力表示（未実装、現在は固定テキスト）
-            parent.spawn((
+            (
                 Text::new("Attack: ".to_string()),
                 TextFont {
                     font_size: 30.0,
                     ..default()
                 },
                 TextColor(WHITE.into()),
-            ));
+            ),
             // 防御力表示（未実装、現在は固定テキスト）
-            parent.spawn((
+            (
                 Text::new("Defense: ".to_string()),
                 TextFont {
                     font_size: 30.0,
                     ..default()
                 },
                 TextColor(WHITE.into()),
-            ));
+            ),
             // ゴールド表示（未実装、現在は固定テキスト）
-            parent.spawn((
+            (
                 Text::new("Gold: ".to_string()),
                 TextFont {
                     font_size: 30.0,
                     ..default()
                 },
                 TextColor(WHITE.into()),
-            ));
-        });
+            ),
+        ],
+    ));
 }

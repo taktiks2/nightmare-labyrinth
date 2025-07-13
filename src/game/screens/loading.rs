@@ -27,32 +27,31 @@ pub(super) fn plugin(app: &mut App) {
 /// * `commands` - EntityとComponentをスポーンするためのコマンド
 fn setup_loading(mut commands: Commands) {
     // メインコンテナを作成（フルスクリーンで中央配置）
-    commands
-        .spawn((
-            Node {
-                // コンテンツを中央に配置
-                align_items: AlignItems::Center,
-                justify_content: JustifyContent::Center,
-                // フルスクリーンサイズ
-                width: Val::Percent(100.),
-                height: Val::Percent(100.),
-                ..default()
-            },
-            Name::new("loading_screen"),
-            // グレーの背景色
-            BackgroundColor(GRAY.into()),
-            // Loading状態のみで存在し、状態変化時に自動削除
-            StateScoped(states::GameState::Loading),
-        ))
-        .with_children(|parent| {
+    commands.spawn((
+        Node {
+            // コンテンツを中央に配置
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
+            // フルスクリーンサイズ
+            width: Val::Percent(100.),
+            height: Val::Percent(100.),
+            ..default()
+        },
+        Name::new("loading_screen"),
+        // グレーの背景色
+        BackgroundColor(GRAY.into()),
+        // Loading状態のみで存在し、状態変化時に自動削除
+        StateScoped(states::GameState::Loading),
+        children![
             // ローディングテキストを追加
-            parent.spawn((
+            (
                 Text::new("Loading"),
                 TextFont {
                     // 大きなフォントサイズで表示
                     font_size: 60.0,
                     ..default()
                 },
-            ));
-        });
+            )
+        ],
+    ));
 }

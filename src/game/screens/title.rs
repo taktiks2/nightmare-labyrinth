@@ -73,7 +73,34 @@ fn setup_title(mut commands: Commands, game_assets: Res<resources::GameAssets>) 
         .with_children(|parent| {
             // セーブファイルがある場合はContinueボタンを表示
             if save_file_exists {
-                parent.spawn((
+                parent
+                    .spawn((
+                        Node {
+                            align_items: AlignItems::Center,
+                            justify_content: JustifyContent::Center,
+                            width: Val::Px(240.),
+                            height: Val::Px(60.),
+                            ..default()
+                        },
+                        // 黒い背景と丸みを帯びたボタン
+                        BackgroundColor(BLACK.into()),
+                        BorderRadius::px(5., 5., 5., 5.),
+                        Button,
+                        children![(
+                            Text::new("Continue"),
+                            TextFont {
+                                font_size: 40.0,
+                                ..default()
+                            },
+                        )],
+                    ))
+                    // Continueボタンのクリックイベントを監視
+                    .observe(handle_continue_click);
+            }
+
+            // New Gameボタンを常に表示
+            parent
+                .spawn((
                     Node {
                         align_items: AlignItems::Center,
                         justify_content: JustifyContent::Center,
@@ -86,40 +113,15 @@ fn setup_title(mut commands: Commands, game_assets: Res<resources::GameAssets>) 
                     BorderRadius::px(5., 5., 5., 5.),
                     Button,
                     children![(
-                        Text::new("Continue"),
+                        Text::new("New Game"),
                         TextFont {
                             font_size: 40.0,
                             ..default()
                         },
                     )],
-                    Observer::new(handle_continue_click),
-                ));
-                // Continueボタンのクリックイベントを監視
-            }
-            // New Gameボタンを常に表示
-
-            parent.spawn((
-                Node {
-                    align_items: AlignItems::Center,
-                    justify_content: JustifyContent::Center,
-                    width: Val::Px(240.),
-                    height: Val::Px(60.),
-                    ..default()
-                },
-                // 黒い背景と丸みを帯びたボタン
-                BackgroundColor(BLACK.into()),
-                BorderRadius::px(5., 5., 5., 5.),
-                Button,
-                children![(
-                    Text::new("New Game"),
-                    TextFont {
-                        font_size: 40.0,
-                        ..default()
-                    },
-                )],
-                Observer::new(handle_new_game_click),
-            ));
-            // New Gameボタンのクリックイベントを監視
+                ))
+                // New Gameボタンのクリックイベントを監視
+                .observe(handle_new_game_click);
         });
 }
 
