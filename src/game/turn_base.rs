@@ -150,3 +150,145 @@ pub fn handle_game_events(
     // 全イベント処理後にゲームティックを発行
     tick_events.write(events::GameTick);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_collect_actor_queue_with_player_and_enemies() {
+        // プレイヤーと敵がいる状態でキューの収集をテスト
+        let mut app = App::new();
+        app.init_resource::<resources::ActorQueue>();
+        app.add_systems(Update, collect_actor_queue);
+
+        // エンティティをアプリに追加
+        let player = app.world_mut().spawn((components::Player(None),)).id();
+        let enemy1 = app.world_mut().spawn(components::Enemy).id();
+        let enemy2 = app.world_mut().spawn(components::Enemy).id();
+
+        app.update();
+
+        // キューの内容を確認
+        let queue = app.world().resource::<resources::ActorQueue>();
+        assert_eq!(queue.0.len(), 3);
+        assert_eq!(queue.0.front(), Some(&player)); // プレイヤーが先頭
+    }
+
+    #[test]
+    fn test_collect_actor_queue_player_only() {
+        // プレイヤーのみの場合のキュー収集をテスト
+        let mut app = App::new();
+        app.init_resource::<resources::ActorQueue>();
+        app.add_systems(Update, collect_actor_queue);
+
+        let player = app.world_mut().spawn((components::Player(None),)).id();
+
+        app.update();
+
+        let queue = app.world().resource::<resources::ActorQueue>();
+        assert_eq!(queue.0.len(), 1);
+        assert_eq!(queue.0.front(), Some(&player));
+    }
+
+    #[test]
+    fn test_collect_actor_queue_enemies_only() {
+        // 敵のみの場合のキュー収集をテスト
+        let mut app = App::new();
+        app.init_resource::<resources::ActorQueue>();
+        app.add_systems(Update, collect_actor_queue);
+
+        let enemy1 = app.world_mut().spawn(components::Enemy).id();
+        let enemy2 = app.world_mut().spawn(components::Enemy).id();
+
+        app.update();
+
+        let queue = app.world().resource::<resources::ActorQueue>();
+        assert_eq!(queue.0.len(), 2);
+        // プレイヤーがいない場合、敵のみがキューに入る
+        assert!(queue.0.contains(&enemy1));
+        assert!(queue.0.contains(&enemy2));
+    }
+
+    #[test]
+    fn test_handle_input_events() {
+        // 入力イベントの処理をテスト
+        let mut app = App::new();
+        app.add_event::<events::InputEvent>();
+        app.add_systems(Update, handle_input_events);
+
+        let player = app
+            .world_mut()
+            .spawn((
+                components::Player(None),
+                components::Position(IVec2::new(0, 0)),
+            ))
+            .id();
+
+        // 入力イベントを送信
+        app.world_mut()
+            .send_event(events::InputEvent(IVec2::new(1, 0)));
+
+        app.update();
+
+        // プレイヤーの移動目標が設定されたことを確認
+        let player_component = app.world().get::<components::Player>(player).unwrap();
+        assert_eq!(player_component.0, Some(IVec2::new(1, 0)));
+    }
+
+    #[test]
+    fn test_handle_game_events_move() {
+        // 移動イベントの処理をテスト
+        let mut app = App::new();
+        app.init_resource::<resources::Inventory>();
+        app.add_event::<events::GameEvent>();
+        app.add_event::<events::GameTick>();
+        app.add_systems(Update, handle_game_events);
+
+        let entity = app
+            .world_mut()
+            .spawn(Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)))
+            .id();
+
+        // 移動イベントを送信
+        app.world_mut()
+            .send_event(events::GameEvent::Move(entity, IVec2::new(1, 1)));
+
+        app.update();
+
+        // エンティティの位置が更新されたことを確認
+        let transform = app.world().get::<Transform>(entity).unwrap();
+        let expected_translation = utils::position_to_translation(IVec2::new(1, 1), Some(0.0));
+        assert_eq!(transform.translation, expected_translation);
+    }
+
+    #[test]
+    fn test_handle_game_events_collect() {
+        // アイテム収集イベントの処理をテスト
+        let mut app = App::new();
+        app.init_resource::<resources::Inventory>();
+        app.add_event::<events::GameEvent>();
+        app.add_event::<events::GameTick>();
+        app.add_systems(Update, handle_game_events);
+
+        let item = components::Item {
+            name: "テストアイテム".to_string(),
+            item_type: components::ItemType::Potion,
+        };
+        let item_entity = app.world_mut().spawn(item.clone()).id();
+
+        // 収集イベントを送信
+        app.world_mut()
+            .send_event(events::GameEvent::Collect(item_entity));
+
+        app.update();
+
+        // インベントリにアイテムが追加されたことを確認
+        let inventory = app.world().resource::<resources::Inventory>();
+        assert_eq!(inventory.items.len(), 1);
+        assert_eq!(inventory.items[0].name, "テストアイテム");
+
+        // エンティティが削除されたことを確認
+        assert!(app.world().get_entity(item_entity).is_err());
+    }
+}

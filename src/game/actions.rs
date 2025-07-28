@@ -160,3 +160,135 @@ impl Action for AttackAction {
         true
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_move_action_execute() {
+        // 移動アクションの実行をテスト
+        let mut world = World::new();
+        world.init_resource::<Events<events::GameEvent>>();
+
+        let entity = world.spawn(components::Position(IVec2::new(0, 0))).id();
+        let target = IVec2::new(1, 1);
+
+        let action = MoveAction { entity, target };
+        let result = action.execute(&mut world);
+
+        // アクションが実行され、エンティティの位置が更新されることを確認
+        let position = world.get::<components::Position>(entity).unwrap();
+        assert_eq!(position.0, target);
+
+        // 結果として追加のアクションが返されないことを確認
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_move_action_execute_with_item() {
+        // アイテムがある位置への移動をテスト
+        let mut world = World::new();
+        world.init_resource::<Events<events::GameEvent>>();
+
+        let player = world.spawn(components::Position(IVec2::new(0, 0))).id();
+        let item = world
+            .spawn((
+                components::Item {
+                    name: "テストアイテム".to_string(),
+                    item_type: components::ItemType::Potion,
+                },
+                components::Position(IVec2::new(1, 1)),
+            ))
+            .id();
+
+        let target = IVec2::new(1, 1);
+        let action = MoveAction {
+            entity: player,
+            target,
+        };
+
+        action.execute(&mut world);
+
+        // プレイヤーの位置が更新されることを確認
+        let position = world.get::<components::Position>(player).unwrap();
+        assert_eq!(position.0, target);
+    }
+
+    #[test]
+    fn test_move_action_is_valid_no_obstacles() {
+        // 障害物がない場合の移動可能性をテスト
+        let mut world = World::new();
+
+        let entity = world.spawn(components::Position(IVec2::new(0, 0))).id();
+        let target = IVec2::new(1, 1);
+
+        let action = MoveAction { entity, target };
+
+        // レベルデータがない場合はtrueを返すことを確認
+        assert!(action.is_valid(&mut world));
+    }
+
+    #[test]
+    fn test_get_action_at_returns_move_action() {
+        // 指定位置で移動アクションが取得できることをテスト
+        let mut world = World::new();
+
+        let entity = world.spawn(components::Position(IVec2::new(0, 0))).id();
+        let target = IVec2::new(1, 1);
+
+        let action = get_action_at(entity, target, &mut world);
+
+        // 移動アクションが返されることを確認
+        assert!(action.is_some());
+    }
+
+    #[test]
+    fn test_get_enemy_action_finds_valid_direction() {
+        // 敵のアクション取得をテスト
+        let mut world = World::new();
+
+        let enemy = world
+            .spawn((components::Enemy, components::Position(IVec2::new(0, 0))))
+            .id();
+
+        let action = get_enemy_action(enemy, &mut world);
+
+        // 何らかのアクションが返されることを確認
+        assert!(action.is_some());
+    }
+
+    #[test]
+    fn test_get_enemy_action_no_position() {
+        // 位置コンポーネントがない敵のアクション取得をテスト
+        let mut world = World::new();
+
+        let enemy = world.spawn(components::Enemy).id();
+
+        let action = get_enemy_action(enemy, &mut world);
+
+        // 位置がない場合はNoneを返すことを確認
+        assert!(action.is_none());
+    }
+
+    #[test]
+    fn test_attack_action_placeholder() {
+        // 攻撃アクションのプレースホルダー実装をテスト
+        let mut world = World::new();
+
+        let attacker = world.spawn(components::Position(IVec2::new(0, 0))).id();
+        let target = world.spawn(components::Position(IVec2::new(1, 1))).id();
+
+        let action = AttackAction {
+            _entity: attacker,
+            _target: target,
+        };
+
+        // 現在の実装では常にtrueを返すことを確認
+        assert!(action.is_valid(&mut world));
+
+        // 現在の実装では常にNoneを返すことを確認
+        let result = action.execute(&mut world);
+        assert!(result.is_none());
+    }
+}
