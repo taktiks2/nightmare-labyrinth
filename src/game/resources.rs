@@ -66,6 +66,25 @@ impl FromWorld for Inventory {
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum LogType {
+    PlayerAction,
+    EnemyAction,
+    ItemPickup,
+    PlayerDamaged,
+    EnemyDamaged,
+    System,
+}
+
+#[derive(Debug, Clone)]
+pub struct LogEntry {
+    pub message: String,
+    pub log_type: LogType,
+}
+
+#[derive(Resource, Default)]
+pub struct LogQueue(pub VecDeque<LogEntry>);
+
 #[derive(Resource)]
 pub struct QueueSystems {
     pub collect_actor_queue: SystemId,
@@ -82,5 +101,6 @@ pub(super) fn plugin(app: &mut App) {
     app.init_resource::<Inventory>()
         .init_resource::<QueueSystems>()
         .init_resource::<ActionQueue>()
-        .init_resource::<ActorQueue>();
+        .init_resource::<ActorQueue>()
+        .init_resource::<LogQueue>();
 }
