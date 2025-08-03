@@ -28,7 +28,7 @@ pub(super) fn plugin(app: &mut App) {
         // Playing状態に入った時の初期化処理
         .add_systems(
             OnEnter(states::GameState::Playing),
-            (setup_board, setup_menu),
+            (setup_board, setup_menu, setup_log_window),
         )
         // Playing状態中の継続的な処理（メインループ）
         .add_systems(
@@ -38,6 +38,7 @@ pub(super) fn plugin(app: &mut App) {
                 input::handle_keyboard_input,   // キーボード入力処理
                 turn_base::handle_input_events, // 入力イベント処理
                 turn_base::handle_game_events,  // ゲームイベント処理
+                update_log_window_position,     // ログウィンドウの位置更新
             )
                 .run_if(in_state(states::GameState::Playing)),
         )
@@ -344,4 +345,56 @@ pub fn setup_menu(mut commands: Commands) {
             ),
         ],
     ));
+}
+
+fn setup_log_window(mut commands: Commands) {
+    commands.spawn((
+        components::LogWindow,
+        Name::new("log_window"),
+        Node {
+            position_type: PositionType::Absolute,
+            right: Val::Px(SIDE_MENU_WIDTH),
+            bottom: Val::Px(BOTTOM_TAB_HEIGHT),
+            width: Val::Px(400.),
+            height: Val::Px(200.),
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
+            margin: UiRect {
+                left: Val::Px(10.),
+                right: Val::Px(10.),
+                top: Val::Px(10.),
+                bottom: Val::Px(10.),
+            },
+            ..default()
+        },
+        BorderRadius::px(10., 10., 10., 10.),
+        BackgroundColor(Color::srgba(0.0, 0.0, 0.0, 0.8)),
+        // Visibility::Hidden,
+    ));
+}
+
+/// 主人公の位置に基づいてログウィンドウの位置を更新
+fn update_log_window_position(
+    player_query: Query<&Transform, (With<components::Player>, Changed<Transform>)>,
+    mut log_window_query: Query<&mut Node, With<components::LogWindow>>,
+) {
+    if let Ok(player_transform) = player_query.single() {
+        if let Ok(mut node) = log_window_query.single_mut() {
+            // プレイヤーの画面座標を計算（仮定：32ピクセル/タイル）
+            let player_screen_x = player_transform.translation.x;
+
+            let half_board = (globals::WINDOW_WIDTH - SIDE_MENU_WIDTH) / 2.;
+
+            // 画面の中央より右にいる場合は左側に表示、左にいる場合は右側に表示
+            if player_screen_x > half_board {
+                // プレイヤーが右側にいる場合、ログウィンドウを左側に配置
+                node.left = Val::Px(0.);
+                node.right = Val::Auto;
+            } else {
+                // プレイヤーが左側にいる場合、ログウィンドウを右側に配置
+                node.left = Val::Auto;
+                node.right = Val::Px(SIDE_MENU_WIDTH);
+            }
+        }
+    }
 }

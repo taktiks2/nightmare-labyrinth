@@ -4,9 +4,7 @@
 //! `dev`フィーチャーが有効な場合のみコンパイルされる
 
 use bevy::prelude::*;
-// use bevy_egui::EguiPlugin;
-use bevy_inspector_egui::bevy_egui::EguiPlugin;
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 
 /// 開発ツールプラグイン
 ///
