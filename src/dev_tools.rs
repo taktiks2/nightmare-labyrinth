@@ -4,6 +4,8 @@
 //! `dev`フィーチャーが有効な場合のみコンパイルされる
 
 use bevy::prelude::*;
+// use bevy_egui::EguiPlugin;
+use bevy_inspector_egui::bevy_egui::EguiPlugin;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 /// 開発ツールプラグイン
@@ -11,7 +13,7 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 /// 開発時に使用するデバッグツールを追加する
 /// - World Inspector: ゲーム世界の状態をリアルタイムで確認可能
 pub(super) fn plugin(app: &mut App) {
-    // ECSインスペクタープラグインを追加
-    // Entity、Component、ResourceなどをGUIで確認できる
-    app.add_plugins(WorldInspectorPlugin::default());
+    // EguiPluginを先に追加してからWorldInspectorPluginを追加
+    // この順序が重要：EguiPlugin → WorldInspectorPlugin
+    app.add_plugins((EguiPlugin::default(), WorldInspectorPlugin::default()));
 }
