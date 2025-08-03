@@ -9,7 +9,7 @@ use bevy::prelude::*;
 mod camera; // カメラ制御
 mod default; // 基本設定
 mod dev_tools; // 開発用ツール
-mod game; // ゲームメインロジック
+pub mod game; // ゲームメインロジック（公開）
 mod globals; // グローバル定数
 mod mesh; // メッシュ管理
 
@@ -24,7 +24,7 @@ impl Plugin for AppPlugin {
         // コアプラグインを追加（基本設定、カメラ、メッシュ、ゲーム）
         app.add_plugins((default::plugin, camera::plugin, mesh::plugin, game::plugin));
 
-        // 開発ビルド時のみ開発ツールを有効化
+        // 開発ビルド時のみ開発ツールを有効化（最後に追加してプラグイン順序を確保）
         #[cfg(feature = "dev")]
         app.add_plugins(dev_tools::plugin);
     }

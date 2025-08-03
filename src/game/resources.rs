@@ -97,10 +97,16 @@ pub struct ActionQueue(pub VecDeque<Box<dyn actions::Action>>);
 #[derive(Resource, Default)]
 pub struct ActorQueue(pub VecDeque<Entity>);
 
+#[derive(Resource, Default)]
+pub struct DebugConfig {
+    pub initial_state: Option<crate::game::states::GameState>,
+}
+
 pub(super) fn plugin(app: &mut App) {
     app.init_resource::<Inventory>()
         .init_resource::<QueueSystems>()
         .init_resource::<ActionQueue>()
         .init_resource::<ActorQueue>()
-        .init_resource::<LogQueue>();
+        .init_resource::<LogQueue>()
+        .init_resource::<DebugConfig>();
 }
