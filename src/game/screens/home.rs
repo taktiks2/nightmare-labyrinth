@@ -4,7 +4,7 @@
 //! ゲームボードの描画、UI表示、プレイヤー入力、ターン制処理を担当
 //! ローグライクゲームのコアシステムが集約されたモジュール
 
-use bevy::{color::palettes::css::*, prelude::*};
+use bevy::{color::palettes::css::*, prelude::*, text::LineHeight};
 
 use crate::game::{components, events, input, resources, save, states, turn_base, utils};
 use crate::globals;
@@ -39,6 +39,7 @@ pub(super) fn plugin(app: &mut App) {
                 turn_base::handle_input_events, // 入力イベント処理
                 turn_base::handle_game_events,  // ゲームイベント処理
                 update_log_window_position,     // ログウィンドウの位置更新
+                update_log_display,             // ログ表示更新
             )
                 .run_if(in_state(states::GameState::Playing)),
         )
@@ -347,7 +348,7 @@ pub fn setup_menu(mut commands: Commands) {
     ));
 }
 
-fn setup_log_window(mut commands: Commands) {
+fn setup_log_window(mut commands: Commands, game_assets: Res<resources::GameAssets>) {
     commands.spawn((
         components::LogWindow,
         Name::new("log_window"),
@@ -356,9 +357,9 @@ fn setup_log_window(mut commands: Commands) {
             right: Val::Px(SIDE_MENU_WIDTH),
             bottom: Val::Px(BOTTOM_TAB_HEIGHT),
             width: Val::Px(400.),
-            height: Val::Px(200.),
-            align_items: AlignItems::Center,
-            justify_content: JustifyContent::Center,
+            flex_direction: FlexDirection::Column,
+            justify_content: JustifyContent::FlexEnd,
+            padding: UiRect::all(Val::Px(10.)),
             margin: UiRect {
                 left: Val::Px(10.),
                 right: Val::Px(10.),
@@ -369,7 +370,18 @@ fn setup_log_window(mut commands: Commands) {
         },
         BorderRadius::px(10., 10., 10., 10.),
         BackgroundColor(Color::srgba(0.0, 0.0, 0.0, 0.8)),
-        // Visibility::Hidden,
+        Visibility::Hidden,
+        children![(
+            Text::new(""),
+            TextFont {
+                font: game_assets.font_regular.clone(),
+                font_size: 16.0,
+                font_smoothing: default(),
+                line_height: LineHeight::default(),
+            },
+            TextColor(WHITE.into()),
+            Name::new("log_text"),
+        )],
     ));
 }
 
@@ -394,6 +406,38 @@ fn update_log_window_position(
                 // プレイヤーが左側にいる場合、ログウィンドウを右側に配置
                 node.left = Val::Auto;
                 node.right = Val::Px(SIDE_MENU_WIDTH);
+            }
+        }
+    }
+}
+
+/// ログ表示を更新
+fn update_log_display(
+    log_queue: Res<resources::LogQueue>,
+    mut text_query: Query<(&mut Text, &Name)>,
+    mut log_window_query: Query<&mut Visibility, With<components::LogWindow>>,
+) {
+    if log_queue.is_changed() {
+        let logs = log_queue.get_recent_logs();
+
+        // ログウィンドウの表示状態を制御
+        if let Ok(mut visibility) = log_window_query.single_mut() {
+            if logs.is_empty() {
+                *visibility = Visibility::Hidden;
+            } else {
+                *visibility = Visibility::Visible;
+            }
+        }
+
+        // テキストを更新
+        for (mut text, name) in text_query.iter_mut() {
+            if name.as_str() == "log_text" {
+                let log_text = logs
+                    .iter()
+                    .map(|entry| entry.message.clone())
+                    .collect::<Vec<_>>()
+                    .join("\n");
+                **text = log_text;
             }
         }
     }
