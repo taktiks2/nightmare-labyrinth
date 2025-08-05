@@ -125,6 +125,8 @@ pub fn handle_game_events(
     mut tick_events: EventWriter<events::GameTick>,
     mut inventory: ResMut<resources::Inventory>,
     items: Query<&components::Item>,
+    mut log_queue: ResMut<resources::LogQueue>,
+    players: Query<(), With<components::Player>>,
 ) {
     for event in game_events.read() {
         match event {
@@ -132,7 +134,15 @@ pub fn handle_game_events(
             events::GameEvent::Move(entity, target) => {
                 if let Ok(mut transform) = actors.get_mut(*entity) {
                     transform.translation =
-                        utils::position_to_translation(*target, Some(transform.translation.z))
+                        utils::position_to_translation(*target, Some(transform.translation.z));
+
+                    // プレイヤーの移動の場合、ログに座標を記録
+                    if players.get(*entity).is_ok() {
+                        log_queue.add_log(
+                            format!("移動: ({}, {})", target.x, target.y),
+                            resources::LogType::PlayerMove,
+                        );
+                    }
                 }
             }
             // 攻撃処理（現在は未実装）
@@ -141,9 +151,12 @@ pub fn handle_game_events(
             events::GameEvent::Collect(entity) => {
                 if let Ok(item) = items.get(*entity) {
                     inventory.items.push(item.clone());
+                    log_queue.add_log(
+                        format!("{}を取得しました", item.name),
+                        resources::LogType::ItemPickup,
+                    );
                 }
                 commands.entity(*entity).despawn();
-                debug!("{:?}", inventory);
             }
         }
     }

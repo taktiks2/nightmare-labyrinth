@@ -66,6 +66,41 @@ impl FromWorld for Inventory {
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum LogType {
+    PlayerAction,
+    EnemyAction,
+    ItemPickup,
+    PlayerDamaged,
+    EnemyDamaged,
+    System,
+    PlayerMove,
+}
+
+#[derive(Debug, Clone)]
+pub struct LogEntry {
+    pub message: String,
+    pub log_type: LogType,
+}
+
+#[derive(Resource, Default)]
+pub struct LogQueue(pub VecDeque<LogEntry>);
+
+impl LogQueue {
+    pub fn add_log(&mut self, message: String, log_type: LogType) {
+        self.0.push_back(LogEntry { message, log_type });
+
+        // 最新3件のみ保持
+        while self.0.len() > 3 {
+            self.0.pop_front();
+        }
+    }
+
+    pub fn get_recent_logs(&self) -> Vec<LogEntry> {
+        self.0.iter().cloned().collect()
+    }
+}
+
 #[derive(Resource)]
 pub struct QueueSystems {
     pub collect_actor_queue: SystemId,
@@ -88,5 +123,6 @@ pub(super) fn plugin(app: &mut App) {
         .init_resource::<QueueSystems>()
         .init_resource::<ActionQueue>()
         .init_resource::<ActorQueue>()
+        .init_resource::<LogQueue>()
         .init_resource::<DebugConfig>();
 }

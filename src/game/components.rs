@@ -84,3 +84,9 @@ pub struct Health(pub u32);
 /// エンティティのゲーム世界内の位置を表すコンポーネント
 #[derive(Component)]
 pub struct Position(pub IVec2);
+
+#[derive(Component)]
+pub struct LogContainer;
+
+#[derive(Component)]
+pub struct LogEntry;

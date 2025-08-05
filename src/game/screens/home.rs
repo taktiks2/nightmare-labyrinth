@@ -4,7 +4,7 @@
 //! ゲームボードの描画、UI表示、プレイヤー入力、ターン制処理を担当
 //! ローグライクゲームのコアシステムが集約されたモジュール
 
-use bevy::{color::palettes::css::*, prelude::*};
+use bevy::{color::palettes::css::*, prelude::*, text::LineHeight};
 
 use crate::game::{components, events, input, resources, save, states, turn_base, utils};
 use crate::globals;
@@ -28,7 +28,7 @@ pub(super) fn plugin(app: &mut App) {
         // Playing状態に入った時の初期化処理
         .add_systems(
             OnEnter(states::GameState::Playing),
-            (setup_board, setup_menu),
+            (setup_board, setup_menu, setup_log_window),
         )
         // Playing状態中の継続的な処理（メインループ）
         .add_systems(
@@ -38,6 +38,8 @@ pub(super) fn plugin(app: &mut App) {
                 input::handle_keyboard_input,   // キーボード入力処理
                 turn_base::handle_input_events, // 入力イベント処理
                 turn_base::handle_game_events,  // ゲームイベント処理
+                update_log_window_position,     // ログウィンドウの位置更新
+                update_log_display,             // ログ表示更新
             )
                 .run_if(in_state(states::GameState::Playing)),
         )
@@ -344,4 +346,96 @@ pub fn setup_menu(mut commands: Commands) {
             ),
         ],
     ));
+}
+
+fn setup_log_window(mut commands: Commands) {
+    commands.spawn((
+        components::LogContainer,
+        Node {
+            position_type: PositionType::Absolute,
+            right: Val::Px(SIDE_MENU_WIDTH),
+            bottom: Val::Px(BOTTOM_TAB_HEIGHT),
+            width: Val::Px(400.),
+            flex_direction: FlexDirection::Column,
+            margin: UiRect::all(Val::Px(20.)),
+            row_gap: Val::Px(5.),
+            ..default()
+        },
+        Name::new("log_container"),
+    ));
+}
+
+/// 主人公の位置に基づいてログウィンドウの位置を更新
+fn update_log_window_position(
+    player_query: Query<&Transform, (With<components::Player>, Changed<Transform>)>,
+    mut log_container_query: Query<&mut Node, With<components::LogContainer>>,
+) {
+    if let Ok(player_transform) = player_query.single() {
+        if let Ok(mut node) = log_container_query.single_mut() {
+            // プレイヤーの画面座標を計算（仮定：32ピクセル/タイル）
+            let player_screen_x = player_transform.translation.x;
+
+            let half_board = (globals::WINDOW_WIDTH - SIDE_MENU_WIDTH) / 2.;
+
+            // 画面の中央より右にいる場合は左側に表示、左にいる場合は右側に表示
+            if player_screen_x > half_board {
+                // プレイヤーが右側にいる場合、ログウィンドウを左側に配置
+                node.left = Val::Px(0.);
+                node.right = Val::Auto;
+            } else {
+                // プレイヤーが左側にいる場合、ログウィンドウを右側に配置
+                node.left = Val::Auto;
+                node.right = Val::Px(SIDE_MENU_WIDTH);
+            }
+        }
+    }
+}
+
+/// ログ表示を更新
+fn update_log_display(
+    mut commands: Commands,
+    log_queue: Res<resources::LogQueue>,
+    game_assets: Res<resources::GameAssets>,
+    log_container_query: Query<Entity, With<components::LogContainer>>,
+    log_entry_query: Query<Entity, With<components::LogEntry>>,
+) {
+    if log_queue.is_changed() {
+        let logs = log_queue.get_recent_logs();
+
+        // 既存のログエントリをすべて削除
+        for log_entry in log_entry_query.iter() {
+            commands.entity(log_entry).despawn();
+        }
+
+        if let Ok(log_container_entity) = log_container_query.single() {
+            // 各ログメッセージを個別の枠で囲んで表示
+            for log_entry in logs.iter() {
+                let log_frame = commands
+                    .spawn((
+                        components::LogEntry,
+                        Node {
+                            width: Val::Percent(100.),
+                            padding: UiRect::all(Val::Px(8.)),
+                            ..default()
+                        },
+                        BorderRadius::all(Val::Px(5.)),
+                        BackgroundColor(Color::srgba(0.1, 0.1, 0.1, 0.95)),
+                        children![(
+                            Text::new(log_entry.message.clone()),
+                            TextFont {
+                                font: game_assets.font_regular.clone(),
+                                font_size: 14.0,
+                                ..default()
+                            },
+                            TextColor(WHITE.into()),
+                        )],
+                    ))
+                    .id();
+
+                commands
+                    .entity(log_container_entity)
+                    .add_children(&[log_frame]);
+            }
+        }
+    }
 }

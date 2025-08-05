@@ -39,6 +39,7 @@ pub(super) fn plugin(app: &mut App) {
     ));
 
     // デバッグ機能：指定された初期状態への遷移システム
+    #[cfg(feature = "dev")]
     app.add_systems(Update, debug_state_transition);
 }
 
