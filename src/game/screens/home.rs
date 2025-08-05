@@ -348,50 +348,30 @@ pub fn setup_menu(mut commands: Commands) {
     ));
 }
 
-fn setup_log_window(mut commands: Commands, game_assets: Res<resources::GameAssets>) {
+fn setup_log_window(mut commands: Commands) {
     commands.spawn((
-        components::LogWindow,
-        Name::new("log_window"),
+        components::LogContainer,
         Node {
             position_type: PositionType::Absolute,
             right: Val::Px(SIDE_MENU_WIDTH),
             bottom: Val::Px(BOTTOM_TAB_HEIGHT),
             width: Val::Px(400.),
             flex_direction: FlexDirection::Column,
-            justify_content: JustifyContent::FlexEnd,
-            padding: UiRect::all(Val::Px(10.)),
-            margin: UiRect {
-                left: Val::Px(10.),
-                right: Val::Px(10.),
-                top: Val::Px(10.),
-                bottom: Val::Px(10.),
-            },
+            margin: UiRect::all(Val::Px(20.)),
+            row_gap: Val::Px(5.),
             ..default()
         },
-        BorderRadius::px(10., 10., 10., 10.),
-        BackgroundColor(Color::srgba(0.0, 0.0, 0.0, 0.8)),
-        Visibility::Hidden,
-        children![(
-            Text::new(""),
-            TextFont {
-                font: game_assets.font_regular.clone(),
-                font_size: 16.0,
-                font_smoothing: default(),
-                line_height: LineHeight::default(),
-            },
-            TextColor(WHITE.into()),
-            Name::new("log_text"),
-        )],
+        Name::new("log_container"),
     ));
 }
 
 /// 主人公の位置に基づいてログウィンドウの位置を更新
 fn update_log_window_position(
     player_query: Query<&Transform, (With<components::Player>, Changed<Transform>)>,
-    mut log_window_query: Query<&mut Node, With<components::LogWindow>>,
+    mut log_container_query: Query<&mut Node, With<components::LogContainer>>,
 ) {
     if let Ok(player_transform) = player_query.single() {
-        if let Ok(mut node) = log_window_query.single_mut() {
+        if let Ok(mut node) = log_container_query.single_mut() {
             // プレイヤーの画面座標を計算（仮定：32ピクセル/タイル）
             let player_screen_x = player_transform.translation.x;
 
@@ -413,31 +393,48 @@ fn update_log_window_position(
 
 /// ログ表示を更新
 fn update_log_display(
+    mut commands: Commands,
     log_queue: Res<resources::LogQueue>,
-    mut text_query: Query<(&mut Text, &Name)>,
-    mut log_window_query: Query<&mut Visibility, With<components::LogWindow>>,
+    game_assets: Res<resources::GameAssets>,
+    log_container_query: Query<Entity, With<components::LogContainer>>,
+    log_entry_query: Query<Entity, With<components::LogEntry>>,
 ) {
     if log_queue.is_changed() {
         let logs = log_queue.get_recent_logs();
 
-        // ログウィンドウの表示状態を制御
-        if let Ok(mut visibility) = log_window_query.single_mut() {
-            if logs.is_empty() {
-                *visibility = Visibility::Hidden;
-            } else {
-                *visibility = Visibility::Visible;
-            }
+        // 既存のログエントリをすべて削除
+        for log_entry in log_entry_query.iter() {
+            commands.entity(log_entry).despawn();
         }
 
-        // テキストを更新
-        for (mut text, name) in text_query.iter_mut() {
-            if name.as_str() == "log_text" {
-                let log_text = logs
-                    .iter()
-                    .map(|entry| entry.message.clone())
-                    .collect::<Vec<_>>()
-                    .join("\n");
-                **text = log_text;
+        if let Ok(log_container_entity) = log_container_query.single() {
+            // 各ログメッセージを個別の枠で囲んで表示
+            for log_entry in logs.iter() {
+                let log_frame = commands
+                    .spawn((
+                        components::LogEntry,
+                        Node {
+                            width: Val::Percent(100.),
+                            padding: UiRect::all(Val::Px(8.)),
+                            ..default()
+                        },
+                        BorderRadius::all(Val::Px(5.)),
+                        BackgroundColor(Color::srgba(0.1, 0.1, 0.1, 0.95)),
+                        children![(
+                            Text::new(log_entry.message.clone()),
+                            TextFont {
+                                font: game_assets.font_regular.clone(),
+                                font_size: 14.0,
+                                ..default()
+                            },
+                            TextColor(WHITE.into()),
+                        )],
+                    ))
+                    .id();
+
+                commands
+                    .entity(log_container_entity)
+                    .add_children(&[log_frame]);
             }
         }
     }

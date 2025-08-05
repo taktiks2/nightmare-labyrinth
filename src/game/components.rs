@@ -86,4 +86,7 @@ pub struct Health(pub u32);
 pub struct Position(pub IVec2);
 
 #[derive(Component)]
-pub struct LogWindow;
+pub struct LogContainer;
+
+#[derive(Component)]
+pub struct LogEntry;

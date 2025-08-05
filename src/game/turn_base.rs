@@ -151,9 +151,12 @@ pub fn handle_game_events(
             events::GameEvent::Collect(entity) => {
                 if let Ok(item) = items.get(*entity) {
                     inventory.items.push(item.clone());
+                    log_queue.add_log(
+                        format!("{}を取得しました", item.name),
+                        resources::LogType::ItemPickup,
+                    );
                 }
                 commands.entity(*entity).despawn();
-                debug!("{:?}", inventory);
             }
         }
     }
