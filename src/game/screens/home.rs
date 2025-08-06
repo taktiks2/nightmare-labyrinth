@@ -270,36 +270,46 @@ fn spawn_actor(
 /// * `commands` - EntityとComponentをスポーンするためのコマンド
 pub fn setup_menu(mut commands: Commands) {
     // サイドメニュー（画面右端の情報パネル）
-    commands.spawn((
-        Node {
-            // 絶対位置で画面右端に固定
-            position_type: PositionType::Absolute,
-            top: Val::Px(0.),
-            right: Val::Px(0.),
-            width: Val::Px(SIDE_MENU_WIDTH),
-            height: Val::Percent(100.),
-            // コンテンツを中央に縦並びで配置
-            align_items: AlignItems::Center,
-            justify_content: JustifyContent::Center,
-            flex_direction: FlexDirection::Column,
-            ..default()
-        },
-        BackgroundColor(GRAY.into()),
-        children![
-            // プレースホルダー要素（将来的にインベントリ表示などを追加予定）
-            (
-                Node {
-                    align_items: AlignItems::Center,
-                    justify_content: JustifyContent::Center,
-                    width: Val::Percent(80.),
-                    height: Val::Px(60.),
-                    ..default()
-                },
-                BorderRadius::px(5., 5., 5., 5.),
-                BackgroundColor(BLACK.into()),
-            )
-        ],
-    ));
+    commands
+        .spawn((
+            Node {
+                // 絶対位置で画面右端に固定
+                position_type: PositionType::Absolute,
+                top: Val::Px(0.),
+                right: Val::Px(0.),
+                width: Val::Px(SIDE_MENU_WIDTH),
+                height: Val::Percent(100.),
+                flex_direction: FlexDirection::Column,
+                justify_content: JustifyContent::SpaceBetween,
+                padding: UiRect::all(Val::Px(5.)),
+                ..default()
+            },
+            BackgroundColor(DARK_GRAY.into()),
+        ))
+        .with_children(|parent| {
+            // アイテムスロット
+            (0..20).for_each(|i| {
+                parent.spawn((
+                    Node {
+                        width: Val::Percent(100.),
+                        height: Val::Px(30.),
+                        align_items: AlignItems::Center,
+                        justify_content: JustifyContent::Center,
+                        ..default()
+                    },
+                    BorderRadius::all(Val::Px(3.)),
+                    BackgroundColor(Color::srgba(0.2, 0.2, 0.2, 0.8)),
+                    children![(
+                        Text::new("空スロット"),
+                        TextFont {
+                            font_size: 12.0,
+                            ..default()
+                        },
+                        TextColor(Color::srgba(0.7, 0.7, 0.7, 1.0)),
+                    )],
+                ));
+            });
+        });
 
     // ボトムステータスバー（画面下部のプレイヤーステータス表示）
     commands.spawn((
